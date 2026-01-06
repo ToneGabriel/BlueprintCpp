@@ -1,0 +1,52 @@
+#include "{{ cpp_class.name }}.h"
+
+
+{% for ns in namespaces %}
+namespace {{ ns }} {
+{% endfor %}
+
+
+{# Public methods #}
+// public methods --START--
+
+{% for m in cpp_class.methods.public %}
+{{ m.ret }} {{ cpp_class.name }}::{{ m.name }}({{ m.args }}){% if m.const %} const {% endif %}{% if m.noexcept %} noexcept {% endif %}
+
+{
+    // TODO: implement
+}
+
+{% endfor %}
+// public methods --END--
+
+{# Protected methods #}
+// protected methods --START--
+
+{% for m in cpp_class.methods.protected %}
+{{ m.ret }} {{ cpp_class.name }}::{{ m.name }}({{ m.args }}){% if m.const %} const {% endif %}{% if m.noexcept %} noexcept {% endif %}
+
+{
+    // TODO: implement
+}
+
+{% endfor %}
+// protected methods --END--
+
+{# Private methods #}
+// private methods --START--
+
+{% for m in cpp_class.methods.private %}
+{{ m.ret }} {{ cpp_class.name }}::{{ m.name }}({{ m.args }}){% if m.const %} const {% endif %}{% if m.noexcept %} noexcept {% endif %}
+
+{
+    // TODO: implement
+}
+
+{% endfor %}
+// private methods --END--
+
+
+{% for ns in namespaces | reverse %}
+} // namespace {{ ns }}
+{% endfor %}
+

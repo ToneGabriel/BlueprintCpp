@@ -1,0 +1,8 @@
+class {{ cpp_class.name }}
+{% if cpp_class.bases %}
+    : public {{ cpp_class.bases[0] }}
+    {% for b in cpp_class.bases[1:] %}
+    , public {{ b }}
+    {% endfor %}
+{% endif %}
+{

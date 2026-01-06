@@ -1,0 +1,34 @@
+{
+    "name": "BlueprintCpp Dev Container",
+    "build":
+    {
+        "context": "..",
+        "dockerfile": "../.containers/Dockerfile.dev",
+        "args":
+        {
+            "BASE_IMAGE": "ubuntu:22.04"
+        }
+    },
+
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+    "customizations":
+    {
+        "vscode":
+        {
+            "extensions":
+            [
+                "ms-python.python",
+                "wholroyd.jinja",
+                "editorconfig.editorconfig",
+                "gruntfuggly.todo-tree"
+            ],
+            "settings":
+            {
+                "terminal.integrated.shell.linux": "/bin/bash",
+                "editor.formatOnSave": false,
+                "files.autoSave": "onFocusChange"
+            }
+        }
+    }
+}

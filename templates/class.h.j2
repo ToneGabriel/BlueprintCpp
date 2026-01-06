@@ -1,0 +1,88 @@
+#ifndef {{ include_guard }}
+#define {{ include_guard }}
+
+
+{% for ns in namespaces %}
+namespace {{ ns }} {
+{% endfor %}
+
+
+{% if cpp_class.is_interface %}
+{# Interface class #}
+class {{ cpp_class.name }}
+{
+public:
+    virtual ~{{ cpp_class.name }}() = default;
+{% for m in cpp_class.methods.public %}
+    virtual {{ m.ret }} {{ m.name }}({{ m.args }}){% if m.const %} const{% endif %}{% if m.noexcept %} noexcept{% endif %} = 0;
+{% endfor %}
+}; // class {{ cpp_class.name }}
+{% else %}
+{# Normal class #}
+class {{ cpp_class.name }}{% if cpp_class.bases %} :
+{% for b in cpp_class.bases %}
+    public {{ b }}{% if not loop.last %},
+    {% endif %}
+{% endfor %}
+{% endif %}
+
+{
+{# Public members #}
+// public members --START--
+public:
+{% for a in cpp_class.members.public %}
+    {{ a.type }} {{ a.name }};
+{% endfor %}
+// public members --END--
+
+{# Protected members #}
+// protected members --START--
+protected:
+{% for a in cpp_class.members.protected %}
+    {{ a.type }} {{ a.name }};
+{% endfor %}
+// protected members --END--
+
+{# Private members #}
+// private members --START--
+private:
+{% for a in cpp_class.members.private %}
+    {{ a.type }} {{ a.name }};
+{% endfor %}
+// private members --END--
+
+{# Public methods #}
+// public methods --START--
+public:
+{% for m in cpp_class.methods.public %}
+    {{ m.ret }} {{ m.name }}({{ m.args }}){% if m.const %} const{% endif %}{% if m.noexcept %} noexcept{% endif %};
+{% endfor %}
+// public methods --END--
+
+{# Protected methods #}
+// protected methods --START--
+protected:
+{% for m in cpp_class.methods.protected %}
+    {{ m.ret }} {{ m.name }}({{ m.args }}){% if m.const %} const{% endif %}{% if m.noexcept %} noexcept{% endif %};
+{% endfor %}
+// protected methods --END--
+
+{# Private methods #}
+// private methods --START--
+private:
+{% for m in cpp_class.methods.private %}
+    {{ m.ret }} {{ m.name }}({{ m.args }}){% if m.const %} const{% endif %}{% if m.noexcept %} noexcept{% endif %};
+{% endfor %}
+// private methods --END--
+
+}; // class {{ cpp_class.name }}
+{% endif %}
+
+
+{% for ns in namespaces | reverse %}
+} // namespace {{ ns }}
+{% endfor %}
+
+
+#endif // {{ include_guard }}
+
