@@ -33,6 +33,7 @@ RUN apt-get update                                          &&  \
 # Install Python packages for code generation (jinja2)
 RUN pip3 install --no-cache-dir \
         jinja2                  \
+        pyyaml                  \
         pyinstaller
 
 # Download plantuml.jar

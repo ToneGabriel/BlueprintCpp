@@ -1,0 +1,41 @@
+name: Module1
+
+namespaces: [interfaces, module]
+
+includes:
+  - <string>
+  - "base/BaseModule"
+  - "interfaces/IRuntime"
+  - "interfaces/IModuleType1"
+
+inherits:
+  - base::BaseModule
+  - interfaces::IRuntime
+  - interfaces::IModuleType1
+
+members:
+  - name: id
+    type: int
+    visibility: private
+  - name: name
+    type: std::string
+    visibility: public
+
+methods:
+  - name: Start
+    visibility: public
+    return_type: void
+    params: []
+    stereotypes: []
+  - name: SetName
+    visibility: protected
+    return_type: void
+    params:
+      - name: new_name
+        type: const std::string&
+    stereotypes:
+      - const
+      - noexcept
+      - override
+      - virtual
+      - virtual_0
