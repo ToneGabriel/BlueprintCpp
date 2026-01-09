@@ -1,14 +1,21 @@
 import os
 import sys
 import re
+from importlib.resources import files
 from jinja2 import Environment, FileSystemLoader
+
 
 # ------------------------
 # Templates directory
 # ------------------------
-TEMPLATE_DIR = "templates"  # folder where your .j2 templates are stored
+_GENERATION_ENVIRONMENT = Environment(loader=FileSystemLoader(str(files("templates"))),
+                                      trim_blocks=True,
+                                      lstrip_blocks=True
+                                      )
 
-env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
+_TEMPLATE_H = _GENERATION_ENVIRONMENT.get_template("class.h.j2")
+_TEMPLATE_CPP = _GENERATION_ENVIRONMENT.get_template("class.cpp.j2")
+
 
 # ------------------------
 # Regexes to parse PlantUML
@@ -18,6 +25,7 @@ RE_CLASS = re.compile(r'(class|interface)\s+(\w+)\s*{?')
 RE_MEMBER = re.compile(r'([+\-#])(\w+)\s*:\s*(.+)')
 RE_METHOD = re.compile(r'([+\-#])(\w+)\s*\(([^)]*)\)\s*(<<[^>]+>>)?\s*(?::\s*(.+))?')
 RE_INHERIT = re.compile(r'(\w+)\s*\.up\.\|>\s*(\w+(?:\.\w+)*)')
+
 
 # ------------------------
 # Data structures
@@ -120,8 +128,8 @@ def generate_code(filepath, namespaces, classes):
 
         include_guard = f"{cls_name.upper()}_H"
 
-        h_template = env.get_template("class.h.j2")
-        cpp_template = env.get_template("class.cpp.j2")
+        h_template = _GENERATION_ENVIRONMENT.get_template("class.h.j2")
+        cpp_template = _GENERATION_ENVIRONMENT.get_template("class.cpp.j2")
 
         # determine namespace path
         ns_path = [ns for ns in namespaces if ns]

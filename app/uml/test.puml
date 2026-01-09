@@ -1,0 +1,20 @@
+@startuml Module1
+
+
+namespace interfaces {
+    interface IRuntime
+    interface IModuleType1
+}
+
+namespace base {
+    class BaseModule
+}
+
+namespace module {
+class Module1 extends base.BaseModule implements interfaces.IRuntime, interfaces.IModuleType1 {
+
+}
+}
+
+
+@enduml
