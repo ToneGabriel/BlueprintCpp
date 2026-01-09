@@ -2,12 +2,15 @@
 
 
 namespace interfaces {
-    interface IRuntime
-    interface IModuleType1
+    interface IRuntime {
+    }
+    interface IModuleType1 {
+    }
 }
 
 namespace base {
-    class BaseModule
+    class BaseModule {
+    }
 }
 
 namespace module {

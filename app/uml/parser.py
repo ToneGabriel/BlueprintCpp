@@ -70,13 +70,13 @@ class UmlModelParser:
                     continue
 
                 # -------------------------
-                # Class / interface start
+                # Class / interface start (MUST have '{')
                 # -------------------------
                 decl_match = re.match(
                     r'(class|interface)\s+(\w+)'
                     r'(?:\s+extends\s+([\w:.]+))?'
                     r'(?:\s+implements\s+([\w:.,\s]+))?'
-                    r'\s*\{?',
+                    r'\s*\{',
                     line
                 )
 
@@ -85,16 +85,16 @@ class UmlModelParser:
                     namespaces = self._current_namespaces(block_stack)
 
                     self._ensure_item(name, kind, namespaces)
-                    block_stack.append((kind, name))   # ALWAYS push
-
-                    item = self.model[name]
+                    block_stack.append((kind, name))
 
                     if base:
-                        item["inherits"].append(normalize_qualified(base))
+                        self.model[name]["inherits"].add(
+                            normalize_qualified(base)
+                        )
 
                     if impls:
                         for i in impls.split(","):
-                            item["implements"].append(
+                            self.model[name]["implements"].add(
                                 normalize_qualified(i.strip())
                             )
                     continue
@@ -116,10 +116,9 @@ class UmlModelParser:
                     relation = ARROW_RELATION.get(arrow, "inherits")
 
                     if relation == "implements" or dst_type == "interface":
-                        self.model[src]["implements"].append(dst)
+                        self.model[src]["implements"].add(dst)
                     else:
-                        self.model[src]["inherits"].append(dst)
-
+                        self.model[src]["inherits"].add(dst)
                     continue
 
                 # -------------------------
@@ -153,8 +152,8 @@ class UmlModelParser:
                 "type": kind,
                 "namespaces": list(namespaces or []),
                 "include_guard": self._make_guard(name, namespaces),
-                "inherits": [],
-                "implements": [],
+                "inherits": set(),
+                "implements": set(),
                 "members": defaultdict(list),
                 "methods": defaultdict(list),
                 "source_files": []
@@ -212,6 +211,5 @@ if __name__ == "__main__":
     parser = UmlModelParser()
     model = parser.parse_directory(Path("."))
 
-    # Debug print
     import pprint
     pprint.pprint(model)
