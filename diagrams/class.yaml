@@ -1,12 +1,15 @@
 name: Module1
-
-namespaces: [interfaces, module]
+type: Class # or File
+description: File Description
 
 includes:
   - <string>
   - "base/BaseModule"
   - "interfaces/IRuntime"
   - "interfaces/IModuleType1"
+
+# namespaces are nested in order
+namespaces: [interfaces, module]
 
 inherits:
   - base::BaseModule
@@ -17,9 +20,11 @@ members:
   - name: id
     type: int
     visibility: private
+    description: Member description
   - name: name
     type: std::string
     visibility: public
+    description: Member description
 
 methods:
   - name: Start
@@ -27,6 +32,8 @@ methods:
     return_type: void
     params: []
     stereotypes: []
+    description: Method description
+
   - name: SetName
     visibility: protected
     return_type: void
@@ -39,3 +46,4 @@ methods:
       - override
       - virtual
       - virtual_0
+    description: Method description
