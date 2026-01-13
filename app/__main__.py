@@ -1,7 +1,8 @@
-import os
 import impl
+import config
+
+import os
 import argparse
-from pathlib import Path
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -23,36 +24,37 @@ def parse_arguments() -> argparse.Namespace:
 def main() -> None:
     args = parse_arguments()
 
-    input_path = Path(args.input)
-    output_path = Path(args.output)
+    input_path: str = args.input
+    output_path: str = args.output
+
+    generator = impl.CppGenerator(config.JINJA_ENV_PACKAGE,
+                                  config.HEADER_TEMPLATE_FILENAME,
+                                  config.SOURCE_TEMPLATE_FILENAME
+                                  )
 
     for root, dirs, files in os.walk(input_path):
         for file in files:
             if file.endswith((".yaml", ".yml")):
-                # Path to file
-                src_file = os.path.join(root, file)
+                # Full path to file
+                filepath = os.path.join(root, file)
 
                 # Preserve relative directory structure
-                rel_path = os.path.relpath(root, input_path)
-                dest_dir = os.path.join(output_path, rel_path)
+                relative_filepath = os.path.relpath(root, input_path)
 
-                os.makedirs(dest_dir, exist_ok=True)
+                destination_directorypath = os.path.join(output_path, relative_filepath)
+                destination_filepath = os.path.join(destination_directorypath, file)
 
-                module = impl.load_module_yaml(src_file)
+                os.makedirs(destination_directorypath, exist_ok=True)
 
-                header_content = impl.generate_header_content(module)
-                source_content = impl.generate_source_content(module)
+                generator.load_model(filepath)
+                header_content = generator.generate_header_content()
+                source_content = generator.generate_source_content()
 
-                dest_file = os.path.join(dest_dir, file)
+                with open(destination_filepath, 'w') as f:
+                    f.write(header_content)
 
-                # shutil.copy2(src_file, dest_file)
-
-
-    # with open(h_path, 'w') as f:
-    #     f.write(header_content)
-
-    # with open(cpp_path, 'w') as f:
-    #     f.write(source_content)
+                with open(destination_filepath, 'w') as f:
+                    f.write(source_content)
 
 
 if __name__ == "__main__":
