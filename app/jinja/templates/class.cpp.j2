@@ -1,7 +1,7 @@
-#include "{{ cpp_class.name }}.h"
+#include "{{ model.name }}.h"
 
 
-{% for ns in namespaces %}
+{% for ns in model.namespaces %}
 namespace {{ ns }} {
 {% endfor %}
 
@@ -9,8 +9,8 @@ namespace {{ ns }} {
 {# Public methods #}
 // public methods --START--
 
-{% for m in cpp_class.methods.public %}
-{{ m.ret }} {{ cpp_class.name }}::{{ m.name }}({{ m.args }}){% if m.const %} const {% endif %}{% if m.noexcept %} noexcept {% endif %}
+{% for m in model.methods.public %}
+{{ m.ret }} {{ model.name }}::{{ m.name }}({{ m.args }}){% if m.const %} const {% endif %}{% if m.noexcept %} noexcept {% endif %}
 
 {
     // TODO: implement
@@ -22,8 +22,8 @@ namespace {{ ns }} {
 {# Protected methods #}
 // protected methods --START--
 
-{% for m in cpp_class.methods.protected %}
-{{ m.ret }} {{ cpp_class.name }}::{{ m.name }}({{ m.args }}){% if m.const %} const {% endif %}{% if m.noexcept %} noexcept {% endif %}
+{% for m in model.methods.protected %}
+{{ m.ret }} {{ model.name }}::{{ m.name }}({{ m.args }}){% if m.const %} const {% endif %}{% if m.noexcept %} noexcept {% endif %}
 
 {
     // TODO: implement
@@ -35,8 +35,8 @@ namespace {{ ns }} {
 {# Private methods #}
 // private methods --START--
 
-{% for m in cpp_class.methods.private %}
-{{ m.ret }} {{ cpp_class.name }}::{{ m.name }}({{ m.args }}){% if m.const %} const {% endif %}{% if m.noexcept %} noexcept {% endif %}
+{% for m in model.methods.private %}
+{{ m.ret }} {{ model.name }}::{{ m.name }}({{ m.args }}){% if m.const %} const {% endif %}{% if m.noexcept %} noexcept {% endif %}
 
 {
     // TODO: implement
@@ -46,7 +46,7 @@ namespace {{ ns }} {
 // private methods --END--
 
 
-{% for ns in namespaces | reverse %}
+{% for ns in model.namespaces | reverse %}
 } // namespace {{ ns }}
 {% endfor %}
 

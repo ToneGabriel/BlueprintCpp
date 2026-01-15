@@ -1,88 +1,117 @@
-#ifndef {{ include_guard }}
-#define {{ include_guard }}
+#ifndef {{ model.include_guard }}
+#define {{ model.include_guard }}
 
 
-{% for ns in namespaces %}
+/*
+{{ model.description }}
+*/
+
+
+{% for inc in model.includes %}
+#include <{{ inc }}>
+{% endfor %}
+
+
+{% for ns in model.namespaces %}
 namespace {{ ns }} {
 {% endfor %}
 
 
-{% if cpp_class.is_interface %}
-{# Interface class #}
-class {{ cpp_class.name }}
-{
-public:
-    virtual ~{{ cpp_class.name }}() = default;
-{% for m in cpp_class.methods.public %}
-    virtual {{ m.ret }} {{ m.name }}({{ m.args }}){% if m.const %} const{% endif %}{% if m.noexcept %} noexcept{% endif %} = 0;
-{% endfor %}
-}; // class {{ cpp_class.name }}
-{% else %}
-{# Normal class #}
-class {{ cpp_class.name }}{% if cpp_class.bases %} :
-{% for b in cpp_class.bases %}
-    public {{ b }}{% if not loop.last %},
-    {% endif %}
+{# Class start #}
+class {{ model.name }}
+{% if model.inherits %}
+{{indentation}}: public {{ model.inherits[0] }}
+{% for b in model.inherits[1:] %}
+{{indentation}}, public {{ b }}
 {% endfor %}
 {% endif %}
-
 {
 {# Public members #}
 // public members --START--
 public:
-{% for a in cpp_class.members.public %}
-    {{ a.type }} {{ a.name }};
+{% for a in model.members.public %}
+{{indentation}}{{ a.type }} {{ a.name }};
 {% endfor %}
 // public members --END--
 
 {# Protected members #}
 // protected members --START--
 protected:
-{% for a in cpp_class.members.protected %}
-    {{ a.type }} {{ a.name }};
+{% for a in model.members.protected %}
+{{indentation}}{{ a.type }} {{ a.name }};
 {% endfor %}
 // protected members --END--
 
 {# Private members #}
 // private members --START--
 private:
-{% for a in cpp_class.members.private %}
-    {{ a.type }} {{ a.name }};
+{% for a in model.members.private %}
+{{indentation}}{{ a.type }} {{ a.name }};
 {% endfor %}
 // private members --END--
 
 {# Public methods #}
 // public methods --START--
 public:
-{% for m in cpp_class.methods.public %}
-    {{ m.ret }} {{ m.name }}({{ m.args }}){% if m.const %} const{% endif %}{% if m.noexcept %} noexcept{% endif %};
+{% for m in model.methods.public %}
+{{indentation}}{% if m.stereotypes.virtual or m.stereotypes.virtual_0 %}virtual {% endif -%}
+{%- if m.return_type %}{{ m.return_type }} {% endif -%}
+{{ m.name }}(
+{%- for p in m.params -%}
+{{ p.type }} {{ p.name }}{% if not loop.last %}, {% endif %}
+{%- endfor -%}
+)
+{%- if m.stereotypes.const %} const{% endif -%}
+{%- if m.stereotypes.noexcept %} noexcept{% endif -%}
+{%- if m.stereotypes.override %} override{% endif -%}
+{%- if m.stereotypes.virtual_0 %} = 0{% endif -%};
 {% endfor %}
 // public methods --END--
 
 {# Protected methods #}
 // protected methods --START--
 protected:
-{% for m in cpp_class.methods.protected %}
-    {{ m.ret }} {{ m.name }}({{ m.args }}){% if m.const %} const{% endif %}{% if m.noexcept %} noexcept{% endif %};
+{% for m in model.methods.protected %}
+{{indentation}}{% if m.stereotypes.virtual or m.stereotypes.virtual_0 %}virtual {% endif -%}
+{%- if m.return_type %}{{ m.return_type }} {% endif -%}
+{{ m.name }}(
+{%- for p in m.params -%}
+{{ p.type }} {{ p.name }}{% if not loop.last %}, {% endif %}
+{%- endfor -%}
+)
+{%- if m.stereotypes.const %} const{% endif -%}
+{%- if m.stereotypes.noexcept %} noexcept{% endif -%}
+{%- if m.stereotypes.override %} override{% endif -%}
+{%- if m.stereotypes.virtual_0 %} = 0{% endif -%};
 {% endfor %}
 // protected methods --END--
 
 {# Private methods #}
 // private methods --START--
 private:
-{% for m in cpp_class.methods.private %}
-    {{ m.ret }} {{ m.name }}({{ m.args }}){% if m.const %} const{% endif %}{% if m.noexcept %} noexcept{% endif %};
+{% for m in model.methods.private %}
+{{indentation}}{% if m.stereotypes.virtual or m.stereotypes.virtual_0 %}virtual {% endif -%}
+{%- if m.return_type %}{{ m.return_type }} {% endif -%}
+{{ m.name }}(
+{%- for p in m.params -%}
+{{ p.type }} {{ p.name }}{% if not loop.last %}, {% endif %}
+{%- endfor -%}
+)
+{%- if m.stereotypes.const %} const{% endif -%}
+{%- if m.stereotypes.noexcept %} noexcept{% endif -%}
+{%- if m.stereotypes.override %} override{% endif -%}
+{%- if m.stereotypes.virtual_0 %} = 0{% endif -%};
 {% endfor %}
 // private methods --END--
 
-}; // class {{ cpp_class.name }}
-{% endif %}
+}; // class {{ model.name }}
+{# Class end #}
 
 
-{% for ns in namespaces | reverse %}
+{% for ns in model.namespaces | reverse %}
 } // namespace {{ ns }}
 {% endfor %}
 
 
-#endif // {{ include_guard }}
+#endif // {{ model.include_guard }}
 

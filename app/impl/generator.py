@@ -5,6 +5,9 @@ from jinja2 import Environment, PackageLoader
 
 
 class CppGenerator:
+    _INDENT = "    "
+    _STEREOTYPES = {"virtual", "virtual_0", "override", "const", "noexcept"}
+
     def __init__(self,
                  jinja_env_package: str,
                  header_template_filename: str,
@@ -19,17 +22,17 @@ class CppGenerator:
         self.template_cpp = self.env.get_template(source_template_filename)
         self.model = None
 
-    def load_model(self, yamlpath: str) -> None:
-        data = yaml.safe_load(Path(yamlpath).read_text())
+    def load_model(self, yaml_path: Path) -> None:
+        data = yaml.safe_load(yaml_path.read_text())
         self.model = self._parse_yaml(data)
 
     def generate_header_content(self) -> str:
         if self.model:
-            return self.template_h.render(model=self.model)
+            return self.template_h.render(model=self.model, indentation=CppGenerator._INDENT)
 
     def generate_source_content(self) -> str:
         if self.model:
-            return self.template_cpp.render(model=self.model)
+            return self.template_cpp.render(model=self.model, indentation=CppGenerator._INDENT)
 
     def _parse_yaml(self, data: dict[str, Any]) -> dict[str, Any]:
         # Base structure
@@ -38,6 +41,7 @@ class CppGenerator:
                     "type": data.get("type", "Class"),
                     "description": data.get("description", None),
                     "namespaces": data.get("namespaces", []),
+                    "include_guard": "",
                     "includes": data.get("includes", []),
                     "inherits": data.get("inherits", []),
                     "members": {
@@ -51,6 +55,10 @@ class CppGenerator:
                                     "private": []
                                 }
                 }
+
+        # Include Guard
+        include_guard_parts = model["namespaces"] + [model["name"], "H"]
+        model["include_guard"] = "_".join(p.upper() for p in include_guard_parts)
 
         # Members
         for m in data.get("members", []):
@@ -75,7 +83,9 @@ class CppGenerator:
                                                                         "type": p.get("type", "void")
                                                                     } for p in m.get("params", [])
                                                                 ],
-                                                    "stereotypes": m.get("stereotypes", []),
+                                                    "stereotypes":  {
+                                                                        s: (s in m.get("stereotypes", [])) for s in CppGenerator._STEREOTYPES
+                                                                    },
                                                     "description": m.get("description", None)
                                                 })
 
