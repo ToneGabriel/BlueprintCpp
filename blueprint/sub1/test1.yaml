@@ -1,12 +1,12 @@
 name: Module1
 type: Class # or File
-description: File Description
+description:
 
 includes:
-  - <string>
-  - "base/BaseModule"
-  - "interfaces/IRuntime"
-  - "interfaces/IModuleType1"
+  - string
+  - base/BaseModule
+  - interfaces/IRuntime
+  - interfaces/IModuleType1
 
 # namespaces are nested in order
 namespaces: [interfaces, module]
@@ -27,6 +27,10 @@ members:
     description: Member description
 
 methods:
+  - name: ~Module1
+    visibility: public
+    stereotypes:
+      - virtual_0
   - name: Start
     visibility: public
     return_type: void
@@ -40,6 +44,10 @@ methods:
     params:
       - name: new_name
         type: const std::string&
+        description: Param description
+      - name: flag
+        type: int
+        description: Param description
     stereotypes:
       - const
       - noexcept

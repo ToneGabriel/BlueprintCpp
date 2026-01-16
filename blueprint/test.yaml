@@ -1,6 +1,6 @@
 name: Module1
 type: Class # or File
-description: File Description
+description:
 
 includes:
   - string
@@ -44,8 +44,10 @@ methods:
     params:
       - name: new_name
         type: const std::string&
+        description: Param description
       - name: flag
         type: int
+        description: Param description
     stereotypes:
       - const
       - noexcept

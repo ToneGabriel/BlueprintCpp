@@ -5,7 +5,7 @@ from jinja2 import Environment, PackageLoader
 
 
 class CppGenerator:
-    _INDENT = "    "
+    _TAB_INDENT = "    "
     _STEREOTYPES = {"virtual", "virtual_0", "override", "const", "noexcept"}
 
     def __init__(self,
@@ -28,11 +28,11 @@ class CppGenerator:
 
     def generate_header_content(self) -> str:
         if self.model:
-            return self.template_h.render(model=self.model, indentation=CppGenerator._INDENT)
+            return self.template_h.render(model=self.model, tab=CppGenerator._TAB_INDENT)
 
     def generate_source_content(self) -> str:
         if self.model:
-            return self.template_cpp.render(model=self.model, indentation=CppGenerator._INDENT)
+            return self.template_cpp.render(model=self.model, tab=CppGenerator._TAB_INDENT)
 
     def _parse_yaml(self, data: dict[str, Any]) -> dict[str, Any]:
         # Base structure
@@ -80,7 +80,8 @@ class CppGenerator:
                                                     "params":   [
                                                                     {
                                                                         "name": p.get("name", "_param"),
-                                                                        "type": p.get("type", "void")
+                                                                        "type": p.get("type", "void"),
+                                                                        "description": p.get("description", None)
                                                                     } for p in m.get("params", [])
                                                                 ],
                                                     "stereotypes":  {
