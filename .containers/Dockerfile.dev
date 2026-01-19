@@ -10,12 +10,16 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install required packages
 RUN apt-get update                                          &&  \
+    apt-get upgrade -y                                      &&  \
     apt-get install -y --no-install-recommends                  \
+        # for c and cpp
+        clang                                                   \
         # for python
         binutils                                                \
         git                                                     \
         wget                                                    \
         python3                                                 \
+        python3-dev                                             \
         python3-pip                                             \
         python3-setuptools                                      \
         python3-venv                                            \
@@ -31,9 +35,12 @@ RUN apt-get update                                          &&  \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python packages for code generation (jinja2)
-RUN pip3 install --no-cache-dir \
-        jinja2                  \
-        pyyaml                  \
+RUN pip3 install --no-cache-dir         \
+        tree-sitter==0.21.3             \
+        tree-sitter-languages==1.10.2   \
+        clang==14.*                     \
+        jinja2                          \
+        pyyaml                          \
         pyinstaller
 
 # Download plantuml.jar

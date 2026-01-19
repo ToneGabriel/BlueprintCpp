@@ -42,8 +42,10 @@ class CppGenerator:
                     "description": data.get("description", None),
                     "namespaces": data.get("namespaces", []),
                     "include_guard": "",
-                    "includes": data.get("includes", []),
+                    "includes": data.get("includes", {}),
                     "inherits": data.get("inherits", []),
+                    "destructor": {},
+                    "constructors": [],
                     "members": {
                                     "public": [],
                                     "protected": [],
@@ -59,6 +61,31 @@ class CppGenerator:
         # Include Guard
         include_guard_parts = model["namespaces"] + [model["name"], "H"]
         model["include_guard"] = "_".join(p.upper() for p in include_guard_parts)
+
+        # Destructor
+        destructor_data = data.get("destructor", {})
+        model["destructor"] =   {
+                                    "stereotypes":  {
+                                                        s: (s in destructor_data.get("stereotypes", [])) for s in CppGenerator._STEREOTYPES
+                                                    },
+                                    "description": destructor_data.get("description", None)
+                                }
+
+        # Constructors
+        for c in data.get("constructors", []):
+            model["constructors"].append({
+                                            "params":   [
+                                                            {
+                                                                "name": p.get("name", "_param"),
+                                                                "type": p.get("type", "void"),
+                                                                "description": p.get("description", None)
+                                                            } for p in c.get("params", [])
+                                                        ],
+                                            "stereotypes":  {
+                                                                s: (s in c.get("stereotypes", [])) for s in CppGenerator._STEREOTYPES
+                                                            },
+                                            "description": c.get("description", None)
+                                        })
 
         # Members
         for m in data.get("members", []):

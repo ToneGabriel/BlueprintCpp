@@ -2,8 +2,14 @@
 #define {{ model.include_guard }}
 
 
-{% for inc in model.includes %}
+// System includes
+{% for inc in model.includes.system %}
 #include <{{ inc }}>
+{% endfor %}
+
+// Project includes
+{% for inc in model.includes.project %}
+#include "{{ inc }}"
 {% endfor %}
 
 
@@ -22,29 +28,57 @@ class {{ model.name }}
 {% endfor %}
 {% endif %}
 {
+// -- Constructors & Destructor --
+{# Constructors #}
+public:
+{% for c in model.constructors %}
+
+{{tab}}/// @brief {{ c.description }}
+{% for p in c.params %}
+{{tab}}/// @param {{ p.name }} {{ p.description }}
+{% endfor %}
+{{tab}}{{ model.name }}(
+{%- for p in c.params -%}
+{{ p.type }} {{ p.name }}{% if not loop.last %}, {% endif %}
+{%- endfor -%}
+)
+{%- if c.stereotypes.noexcept %} noexcept{% endif -%};
+{% endfor %}
+
+{# Destructor #}
+{{tab}}/// @brief {{ model.destructor.description }}
+{% for p in model.destructor.params %}
+{{tab}}/// @param {{ p.name }} {{ p.description }}
+{% endfor %}
+{{tab}}{% if model.destructor.stereotypes.virtual or model.destructor.stereotypes.virtual_0 %}virtual {% endif -%}
+~{{ model.name }}()
+{%- if model.destructor.stereotypes.noexcept %} noexcept{% endif -%}
+{%- if model.destructor.stereotypes.override %} override{% endif -%}
+{%- if model.destructor.stereotypes.virtual_0 %} = 0{% endif -%};
+
 // -- Members --
 {# Public members #}
 public:
-{% for a in model.members.public %}
+{% for m in model.members.public %}
 
-{{tab}}/// @brief {{ a.description }}
-{{tab}}{{ a.type }} {{ a.name }};
+{{tab}}/// @brief {{ m.description }}
+{{tab}}{{ m.type }} {{ m.name }};
 {% endfor %}
 
 {# Protected members #}
 protected:
-{% for a in model.members.protected %}
+{% for m in model.members.protected %}
 
-{{tab}}/// @brief {{ a.description }}
-{{tab}}{{ a.type }} {{ a.name }};
+{{tab}}/// @brief {{ m.description }}
+{{tab}}{{ m.type }} {{ m.name }};
 {% endfor %}
 
 {# Private members #}
 private:
-{% for a in model.members.private %}
+{% for m in model.members.private %}
 
-{{tab}}/// @brief {{ a.description }}
-{{tab}}{{ a.type }} {{ a.name }};
+{{tab}}/// @brief {{ m.description }}
+{{tab}}{{ m.type }} {{ m.name }};
 {% endfor %}
 
 // -- Methods --

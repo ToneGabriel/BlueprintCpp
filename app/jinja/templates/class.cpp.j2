@@ -7,8 +7,9 @@ namespace {{ ns }} {
 
 
 {# Public methods #}
-{% for m in model.methods.public %}
+// Public Methods
 
+{% for m in model.methods.public %}
 {%- if m.return_type %}{{ m.return_type }} {% endif -%}
 {{ model.name }}::{{ m.name }}(
 {%- for p in m.params -%}
@@ -16,15 +17,18 @@ namespace {{ ns }} {
 {%- endfor -%}
 )
 {%- if m.stereotypes.const %} const{% endif -%}
-{%- if m.stereotypes.noexcept %} noexcept{% endif -%}
+{%- if m.stereotypes.noexcept %} noexcept{% endif %}
+
 {
 {{tab}}// TODO: implement
 }
+
 {% endfor %}
 
 {# Protected methods #}
-{% for m in model.methods.protected %}
+// Protected Methods
 
+{% for m in model.methods.protected %}
 {%- if m.return_type %}{{ m.return_type }} {% endif -%}
 {{ model.name }}::{{ m.name }}(
 {%- for p in m.params -%}
@@ -32,15 +36,18 @@ namespace {{ ns }} {
 {%- endfor -%}
 )
 {%- if m.stereotypes.const %} const{% endif -%}
-{%- if m.stereotypes.noexcept %} noexcept{% endif -%}
+{%- if m.stereotypes.noexcept %} noexcept{% endif %}
+
 {
 {{tab}}// TODO: implement
 }
+
 {% endfor %}
 
 {# Private methods #}
-{% for m in model.methods.private %}
+// Private Methods
 
+{% for m in model.methods.private %}
 {%- if m.return_type %}{{ m.return_type }} {% endif -%}
 {{ model.name }}::{{ m.name }}(
 {%- for p in m.params -%}
@@ -48,7 +55,8 @@ namespace {{ ns }} {
 {%- endfor -%}
 )
 {%- if m.stereotypes.const %} const{% endif -%}
-{%- if m.stereotypes.noexcept %} noexcept{% endif -%}
+{%- if m.stereotypes.noexcept %} noexcept{% endif %}
+
 {
 {{tab}}// TODO: implement
 }

@@ -3,10 +3,12 @@ type: Class # or File
 description:
 
 includes:
-  - string
-  - base/BaseModule
-  - interfaces/IRuntime
-  - interfaces/IModuleType1
+  system:
+    - string
+  project:
+    - base/BaseModule
+    - interfaces/IRuntime
+    - interfaces/IModuleType1
 
 # namespaces are nested in order
 namespaces: [interfaces, module]
@@ -15,6 +17,28 @@ inherits:
   - base::BaseModule
   - interfaces::IRuntime
   - interfaces::IModuleType1
+
+destructor:
+  stereotypes:
+    - noexcept
+    - virtual_0
+  description: Destructor description
+
+constructors:
+  - params: []
+    stereotypes: []
+    description: Default constructor description
+  - params:
+      - name: new_name
+        type: const std::string&
+        description: Param description
+      - name: flag
+        type: int
+        description: Param description
+    stereotypes:
+      - noexcept
+      - virtual_0
+    description: Constructor description
 
 members:
   - name: id
@@ -27,10 +51,6 @@ members:
     description: Member description
 
 methods:
-  - name: ~Module1
-    visibility: public
-    stereotypes:
-      - virtual_0
   - name: Start
     visibility: public
     return_type: void
