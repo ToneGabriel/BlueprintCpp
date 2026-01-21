@@ -25,9 +25,11 @@ destructor:
   description: Destructor description
 
 constructors:
+  # ------------------------
   - params: []
     stereotypes: []
     description: Default constructor description
+  # ------------------------
   - params:
       - name: new_name
         type: const std::string&
@@ -41,23 +43,29 @@ constructors:
     description: Constructor description
 
 members:
+  # ------------------------
   - name: id
     type: int
     visibility: private
     description: Member description
+  # ------------------------
   - name: name
     type: std::string
     visibility: public
     description: Member description
 
+# ================================================
+# Methods
+# ================================================
 methods:
+  # ------------------------
   - name: Start
     visibility: public
     return_type: void
     params: []
     stereotypes: []
     description: Method description
-
+  # ------------------------
   - name: SetName
     visibility: protected
     return_type: void
@@ -75,3 +83,4 @@ methods:
       - virtual
       - virtual_0
     description: Method description
+  # ------------------------

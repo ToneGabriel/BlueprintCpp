@@ -1,7 +1,7 @@
 import yaml
 from typing import Any
 from pathlib import Path
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, PackageLoader, Template
 
 
 class CppGenerator:
@@ -11,28 +11,38 @@ class CppGenerator:
     def __init__(self,
                  jinja_env_package: str,
                  header_template_filename: str,
-                 source_template_filename: str
+                 source_template_filename: str,
+                 standard_include_map: dict[str, str]
                  ):
 
-        self.env = Environment(loader=PackageLoader(jinja_env_package),
-                               trim_blocks=True,
-                               lstrip_blocks=True
-                               )
-        self.template_h = self.env.get_template(header_template_filename)
-        self.template_cpp = self.env.get_template(source_template_filename)
-        self.model = None
+        env: Environment = Environment(loader=PackageLoader(jinja_env_package),
+                                       trim_blocks=True,
+                                       lstrip_blocks=True
+                                       )
+
+        self._template_h: Template                  = env.get_template(header_template_filename)
+        self._template_cpp: Template                = env.get_template(source_template_filename)
+        self._standard_include_map: dict[str, str]  = standard_include_map
+        self._project_include_map: dict[str, str]   = None
+        self._model: dict[str, Any]                 = None
+
+    def create_context(self) -> None:
+        pass
 
     def load_model(self, yaml_path: Path) -> None:
         data = yaml.safe_load(yaml_path.read_text())
-        self.model = self._parse_yaml(data)
+        self._model = self._parse_yaml(data)
 
     def generate_header_content(self) -> str:
-        if self.model:
-            return self.template_h.render(model=self.model, tab=CppGenerator._TAB_INDENT)
+        if self._model:
+            return self._template_h.render(model=self._model, tab=CppGenerator._TAB_INDENT)
 
     def generate_source_content(self) -> str:
-        if self.model:
-            return self.template_cpp.render(model=self.model, tab=CppGenerator._TAB_INDENT)
+        if self._model:
+            return self._template_cpp.render(model=self._model, tab=CppGenerator._TAB_INDENT)
+
+    def _reset_model(self) -> None:
+        pass
 
     def _parse_yaml(self, data: dict[str, Any]) -> dict[str, Any]:
         # Base structure

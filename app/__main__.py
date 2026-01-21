@@ -38,6 +38,7 @@ def main() -> None:
         config.JINJA_ENV_PACKAGE,
         config.HEADER_TEMPLATE_FILENAME,
         config.SOURCE_TEMPLATE_FILENAME,
+        config.STANDARD_INCLUDE_MAP
     )
 
     for yaml_path in input_path.rglob("*.yaml"):

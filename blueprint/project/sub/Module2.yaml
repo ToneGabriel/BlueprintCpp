@@ -1,0 +1,77 @@
+name: Module2
+type: Class # or File
+description:
+
+includes:
+  system:
+    - string
+  project:
+    - base/BaseModule
+    - interfaces/IRuntime
+    - interfaces/IModuleType1
+
+# namespaces are nested in order
+namespaces: [interfaces, module]
+
+inherits:
+  - base::BaseModule
+  - interfaces::IRuntime
+  - interfaces::IModuleType1
+
+destructor:
+  stereotypes:
+    - noexcept
+    - virtual_0
+  description: Destructor description
+
+constructors:
+  - params: []
+    stereotypes: []
+    description: Default constructor description
+  - params:
+      - name: new_name
+        type: const std::string&
+        description: Param description
+      - name: flag
+        type: int
+        description: Param description
+    stereotypes:
+      - noexcept
+      - virtual_0
+    description: Constructor description
+
+members:
+  - name: id
+    type: int
+    visibility: private
+    description: Member description
+  - name: name
+    type: std::string
+    visibility: public
+    description: Member description
+
+methods:
+  - name: Start
+    visibility: public
+    return_type: void
+    params: []
+    stereotypes: []
+    description: Method description
+
+  - name: SetName
+    visibility: protected
+    return_type: void
+    params:
+      - name: new_name
+        type: const std::string&
+        description: Param description
+      - name: flag
+        type: int
+        description: Param description
+    stereotypes:
+      - const
+      - noexcept
+      - override
+      - virtual
+      - virtual_0
+    description: Method description
