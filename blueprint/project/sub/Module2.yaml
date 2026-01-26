@@ -1,77 +1,68 @@
-name: Module2
-type: Class # or File
-description:
+description: "Class description"
 
-includes:
-  system:
-    - string
-  project:
-    - base/BaseModule
-    - interfaces/IRuntime
-    - interfaces/IModuleType1
-
-# namespaces are nested in order
-namespaces: [interfaces, module]
 
 inherits:
-  - base::BaseModule
-  - interfaces::IRuntime
-  - interfaces::IModuleType1
+  # ------------------------
+  - base: project::Module1
+    visibility: "public"
+    virtual: false
+  # ------------------------
+  - base: interfaces::IRuntime
+    visibility: "public"
+    virtual: true
+  # ------------------------
+  - base: interfaces::IModuleType1
+    visibility: "public"
+    virtual: true
 
-destructor:
-  stereotypes:
-    - noexcept
-    - virtual_0
-  description: Destructor description
 
-constructors:
-  - params: []
-    stereotypes: []
-    description: Default constructor description
-  - params:
-      - name: new_name
-        type: const std::string&
-        description: Param description
-      - name: flag
-        type: int
-        description: Param description
-    stereotypes:
-      - noexcept
-      - virtual_0
-    description: Constructor description
-
+# ================================================
+# Members
+# ================================================
 members:
+  # ------------------------
   - name: id
-    type: int
+    type:
+      name: int
+      stereotypes: []
     visibility: private
     description: Member description
+  # ------------------------
   - name: name
-    type: std::string
+    type:
+      name: std::string
+      stereotypes: []
     visibility: public
     description: Member description
 
+
+# ================================================
+# Methods
+# ================================================
 methods:
+  # ------------------------
   - name: Start
     visibility: public
-    return_type: void
+    type:
+      name: void
+      stereotypes: []
     params: []
-    stereotypes: []
     description: Method description
-
+  # ------------------------
   - name: SetName
     visibility: protected
-    return_type: void
+    type:
+      name: void
+      stereotypes: [const, immutable, noexcept, override, virtual, virtual_0]
     params:
       - name: new_name
-        type: const std::string&
+        type:
+          name: std::string
+          stereotypes: [const, lval_reference]
         description: Param description
       - name: flag
-        type: int
+        type:
+          name: int
+          stereotypes: []
         description: Param description
-    stereotypes:
-      - const
-      - noexcept
-      - override
-      - virtual
-      - virtual_0
     description: Method description

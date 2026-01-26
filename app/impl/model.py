@@ -2,21 +2,19 @@ from typing import Any
 from enum import Enum
 
 
-class ParameterStereotype(Enum):
+class Stereotype(Enum):
+    VIRTUAL         = "virtual"
+    VIRTUAL_0       = "virtual_0"
     CONST           = "const"
+    IMMUTABLE       = "immutable"
     VOLATILE        = "volatile"
+    NOEXCEPT        = "noexcept"
+    OVERRIDE        = "override"
+    STATIC          = "static"
     ARRAY           = "array"
     POINTER         = "pointer"
     LVAL_REFERENCE  = "lval_reference"
     RVAL_REFERENCE  = "rval_reference"
-
-
-class MethodStereotype(Enum):
-    VIRTUAL     = "virtual"
-    VIRTUAL_0   = "virtual_0"
-    CONST       = "const"
-    NOEXCEPT    = "noexcept"
-    OVERRIDE    = "override"
 
 
 class Visibility(Enum):
@@ -30,75 +28,96 @@ class ParameterType:
         self._type: dict[str, Any] =    {
                                             "name": name,
                                             "stereotypes":  {
-                                                                s.value: False for s in ParameterStereotype
+                                                                s.value: False for s in Stereotype
                                                             }
                                         }
     @property
     def value(self) -> dict[str, Any]:
         return self._type
 
-    def add_stereotype(self, stereotype: ParameterStereotype) -> None:
+    def add_stereotype(self, stereotype: Stereotype) -> None:
         self._type["stereotypes"][stereotype.value] = True
 
 
 class Parameter:
     def __init__(self,
                  name: str,
-                 type: str,
-                 description: str):
+                 description: str
+                 ):
 
         self._param: dict[str, Any] =   {
                                             "name": name,
-                                            "type": type,
+                                            "type": {},
                                             "description": description
                                         }
+
+        self.set_type(ParameterType("void"))
 
     @property
     def value(self) -> dict[str, Any]:
         return self._param
+    
+    def set_type(self, type: ParameterType) -> None:
+        self._param["type"] = type.value
 
 
 class Method:
     def __init__(self,
                  name: str,
-                 return_type: str,
-                 description: str):
+                 description: str
+                 ):
 
         self._method: dict[str, Any] = {
                                             "name": name,
-                                            "return_type": return_type,
+                                            "type": {},
                                             "description": description,
-                                            "params": [],
-                                            "stereotypes":  {
-                                                                s.value: False for s in MethodStereotype
-                                                            }
+                                            "params": []
                                         }
+
+        self.set_type(ParameterType("void"))
 
     @property
     def value(self) -> dict[str, Any]:
         return self._method
 
+    def set_type(self, type: ParameterType) -> None:
+        self._method["type"] = type.value
+
     def add_parameter(self, param: Parameter) -> None:
         self._method["params"].append(param.value)
 
-    def add_stereotype(self, stereotype: MethodStereotype) -> None:
-        self._method["stereotypes"][stereotype.value] = True
+
+class Inheritance:
+    def __init__(self,
+                 name: str,
+                 visibility: Visibility,
+                 virtual: bool
+                 ):
+        
+        self._inheritance: dict[str, Any] = {
+                                                "name": name,
+                                                "visibility": visibility.value,
+                                                "virtual": virtual
+                                            }
+        
+    @property
+    def value(self) -> dict[str, Any]:
+        return self._inheritance
 
 
 class Model:
-    def __init__(self,
-                 name: str,
-                 type: str,
-                 description: str,
-                 ):
+    def __init__(self, name: str, namespaces: list[str], include_guard: str):
 
         self._model: dict[str, Any] =   {
                                             "name": name,
-                                            "type": type,
-                                            "description": description,
-                                            "namespaces": [],
-                                            "include_guard": "",
-                                            "includes": [],
+                                            "namespaces": namespaces,
+                                            "include_guard": include_guard,
+                                            "description": "",
+                                            "includes_h":   {
+                                                                "system": set(),
+                                                                "project": set(),
+                                                            },
+                                            "includes_cpp": set(),
                                             "inherits": [],
                                             "destructor": {},
                                             "constructors": [],
@@ -113,6 +132,22 @@ class Model:
                                                             Visibility.PRIVATE.value: []
                                                         }
                                         }
+
+    @property
+    def value(self) -> dict[str, Any]:
+        return self._model
+
+    def set_description(self, description: str) -> None:
+        self._model["description"] = description
+
+    def add_inheritance(self, inheritance: Inheritance) -> None:
+        self._model["inherits"].append(inheritance.value)
+
+    def add_system_include_h(self, include_h: str) -> None:
+        self._model["includes_h"]["system"].add(include_h)
+
+    def add_project_include_h(self, include_h: str) -> None:
+        self._model["includes_h"]["project"].add(include_h)
 
     def add_member(self,
                    visibility: Visibility,
