@@ -30,5 +30,5 @@ class CppGenerator:
             return self._template_h.render(model=self._model.value, tab=_TAB_INDENT)
 
     def generate_source_content(self) -> str:
-        if self._model:
+        if self._model and not self._model.headeronly:
             return self._template_cpp.render(model=self._model.value, tab=_TAB_INDENT)

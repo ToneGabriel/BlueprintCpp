@@ -37,6 +37,7 @@ def main() -> None:
     # Instrument files
     file_models: dict[str, impl.Model] = {}
     project_include_map: dict[str, str] = {}
+
     for yaml_path in input_path.rglob("*.yaml"):
         relative_dir = yaml_path.parent.relative_to(input_path)
         base_name = yaml_path.name.removesuffix("".join(yaml_path.suffixes))

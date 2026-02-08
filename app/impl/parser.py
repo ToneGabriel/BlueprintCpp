@@ -20,17 +20,23 @@ class Parser:
         data = yaml.safe_load(yaml_text)
 
         self._model.set_description(data.get("description", "Model description"))
+        self._model.set_headeronly(data.get("headeronly", False))
 
-        # model inheritances
-        for i in data.get("inherits", []):
+        self._parse_inheritances(data.get("inherits", []))
+        self._parse_members(data.get("members", []))
+        self._parse_methods(data.get("methods", []))
+        self._parse_destructor(data.get("destructor", {}))
+        self._parse_constructors(data.get("constructors", []))
+
+    def _parse_inheritances(self, inheritances: list[dict[str, Any]]) -> None:
+        for i in inheritances:
             inheritance = Inheritance(i.get("base", "void"), Visibility(i.get("visibility", "public")), i.get("virtual", False))
             self._model.add_inheritance(inheritance)
             self._check_includes(i.get("base", "void"))
 
-        # model members
-        for m in data.get("members", []):
+    def _parse_members(self, members_data: list[dict[str, Any]]) -> None:
+        for m in members_data:
             visibility = Visibility(m.get("visibility", "private"))
-
             member = Parameter(m.get("name", "_defaultMember"), m.get("description", "Member description"))
 
             # type
@@ -43,10 +49,9 @@ class Parser:
 
             self._model.add_member(visibility, member)
 
-        # model methods
-        for m in data.get("methods", []):
+    def _parse_methods(self, methods_data: list[dict[str, Any]]) -> None:
+        for m in methods_data:
             visibility = Visibility(m.get("visibility", "public"))
-
             method = Method(m.get("name", "_DefaultMethod"), m.get("description", "Method description"))
 
             # return type
@@ -72,6 +77,43 @@ class Parser:
                 method.add_parameter(param)
 
             self._model.add_method(visibility, method)
+
+    def _parse_destructor(self, destructor_data: dict[str, Any]) -> None:
+        method = Method("Ignored", destructor_data.get("description", "Default destructor"))
+
+        mret_type_data = destructor_data.get("type", {})
+        mret_type = ParameterType(mret_type_data.get("name", ""))
+        for st in mret_type_data.get("stereotypes", []):
+            mret_type.add_stereotype(Stereotype(st))
+        method.set_type(mret_type)
+        self._model.set_destructor(method)
+
+    def _parse_constructors(self, constructors_data: list[dict[str, Any]]) -> None:
+        for c in constructors_data:
+            method = Method("Ignored", c.get("description", "Constructor description"))
+
+            # return type
+            mret_type_data = c.get("type", {})
+            mret_type = ParameterType(mret_type_data.get("name", ""))
+            for st in mret_type_data.get("stereotypes", []):
+                mret_type.add_stereotype(Stereotype(st))
+            method.set_type(mret_type)
+
+            # parameters
+            for p in c.get("params", []):
+                param = Parameter(p.get("name", "_defaultParam"), p.get("description", "Parameter description"))
+
+                # type
+                ptype_data = p.get("type", {})
+                ptype = ParameterType(ptype_data.get("name", "void"))
+                for st in ptype_data.get("stereotypes", []):
+                    ptype.add_stereotype(Stereotype(st))
+                param.set_type(ptype)
+                self._check_includes(ptype_data.get("name", "void"))
+
+                method.add_parameter(param)
+
+            self._model.add_constructor(method)
 
     def _check_includes(self, typedef: str) -> None:
         if (typedef in self._standard_include_map):

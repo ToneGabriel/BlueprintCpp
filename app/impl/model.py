@@ -113,6 +113,7 @@ class Model:
                                             "namespaces": namespaces,
                                             "include_guard": include_guard,
                                             "description": "",
+                                            "headeronly": False,
                                             "includes_h":   {
                                                                 "system": set(),
                                                                 "project": set(),
@@ -137,8 +138,19 @@ class Model:
     def value(self) -> dict[str, Any]:
         return self._model
 
+    @property
+    def name(self) -> str:
+        return self._model["name"]
+
+    @property
+    def headeronly(self) -> bool:
+        return self._model["headeronly"]
+
     def set_description(self, description: str) -> None:
         self._model["description"] = description
+
+    def set_headeronly(self, headeronly: bool) -> None:
+        self._model["headeronly"] = headeronly
 
     def add_inheritance(self, inheritance: Inheritance) -> None:
         self._model["inherits"].append(inheritance.value)
@@ -159,3 +171,10 @@ class Model:
                    method: Method) -> None:
         self._model["methods"][visibility.value].append(method.value)
 
+    def set_destructor(self,
+                       method: Method) -> None:
+        self._model["destructor"] = method.value
+
+    def add_constructor(self,
+                        method: Method) -> None:
+        self._model["constructors"].append(method.value)

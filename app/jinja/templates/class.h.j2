@@ -29,7 +29,32 @@ class {{ model.name }}{% if model.inherits %} :
 {% endif %}
 {
 // -- Constructors & Destructor --
-{# TODO }
+public:
+{% for c in model.constructors %}
+
+{{tab}}/// @brief {{ c.description }}
+{% for p in c.params %}
+{{tab}}/// @param {{ p.name }} {{ p.description }}
+{% endfor %}
+{{tab}}{{ model.name }}(
+{%- for p in c.params -%}
+{%- if p.type.stereotypes.const %}const {% endif -%}
+{%- if p.type.stereotypes.volatile %}volatile {% endif -%}
+{%- if p.type.name %}{{ p.type.name }} {% endif -%}
+{%- if p.type.stereotypes.pointer %}*{% endif -%}
+{%- if p.type.stereotypes.lval_reference %}&{% endif -%}
+{%- if p.type.stereotypes.rval_reference %}&&{% endif -%}
+{{ p.name }}{% if not loop.last %}, {% endif %}
+{%- endfor -%}
+)
+{%- if c.type.stereotypes.noexcept %} noexcept{% endif -%};
+{% endfor %}
+
+{{tab}}/// @brief {{ model.destructor.description }}
+{{tab}}{%- if model.destructor.type.stereotypes.virtual or model.destructor.type.stereotypes.virtual_0 %}virtual {% endif -%}
+~{{ model.name }}()
+{%- if model.destructor.type.stereotypes.noexcept %} noexcept{% endif -%}
+{%- if model.destructor.type.stereotypes.virtual_0 %} = 0{% endif -%};
 
 // -- Members --
 {# Public members #}
