@@ -1,32 +1,33 @@
-from .model import Stereotype, Visibility, ParameterType, Inheritance, Parameter, Method, Model
+from .model import Stereotype, Visibility, ParameterType, Inheritance, Parameter, Method, EnumValue, Model
 import yaml
 from typing import Any
 
 
 class Parser:
     def __init__(self,
-                 standard_include_map: dict[str, str],
-                 project_include_map: dict[str, str]
+                 standard_include_map: dict[str, str]
                  ):
 
         self._standard_include_map: dict[str, str]  = standard_include_map
-        self._project_include_map: dict[str, str]   = project_include_map
+        self._project_include_map: dict[str, str]   = {}
         self._model: Model                          = None
 
     def set_model(self, model: Model) -> None:
         self._model = model
 
+    def add_project_include(self, typename: str, include: str) -> None:
+        self._project_include_map[typename] = include
+
     def parse_yaml(self, yaml_text: str) -> None:
         data = yaml.safe_load(yaml_text)
 
         self._model.set_description(data.get("description", "Model description"))
-        self._model.set_headeronly(data.get("headeronly", False))
 
         self._parse_inheritances(data.get("inherits", []))
         self._parse_members(data.get("members", []))
         self._parse_methods(data.get("methods", []))
-        self._parse_destructor(data.get("destructor", {}))
         self._parse_constructors(data.get("constructors", []))
+        self._parse_evalues(data.get("evalues", []))
 
     def _parse_inheritances(self, inheritances: list[dict[str, Any]]) -> None:
         for i in inheritances:
@@ -78,16 +79,6 @@ class Parser:
 
             self._model.add_method(visibility, method)
 
-    def _parse_destructor(self, destructor_data: dict[str, Any]) -> None:
-        method = Method("Ignored", destructor_data.get("description", "Default destructor"))
-
-        mret_type_data = destructor_data.get("type", {})
-        mret_type = ParameterType(mret_type_data.get("name", ""))
-        for st in mret_type_data.get("stereotypes", []):
-            mret_type.add_stereotype(Stereotype(st))
-        method.set_type(mret_type)
-        self._model.set_destructor(method)
-
     def _parse_constructors(self, constructors_data: list[dict[str, Any]]) -> None:
         for c in constructors_data:
             method = Method("Ignored", c.get("description", "Constructor description"))
@@ -114,6 +105,12 @@ class Parser:
                 method.add_parameter(param)
 
             self._model.add_constructor(method)
+
+    def _parse_evalues(self, evalues_data: list[dict[str, Any]]) -> None:
+        for e in evalues_data:
+            evalue = EnumValue(e.get("name", "void"), e.get("value", ""))
+
+            self._model.add_enum_value(evalue)
 
     def _check_includes(self, typedef: str) -> None:
         if (typedef in self._standard_include_map):

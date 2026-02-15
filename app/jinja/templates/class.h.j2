@@ -1,3 +1,4 @@
+{% import "utils.j2" as utils %}
 #ifndef {{ model.include_guard }}
 #define {{ model.include_guard }}
 
@@ -32,71 +33,31 @@ class {{ model.name }}{% if model.inherits %} :
 public:
 {% for c in model.constructors %}
 
-{{tab}}/// @brief {{ c.description }}
-{% for p in c.params %}
-{{tab}}/// @param {{ p.name }} {{ p.description }}
-{% endfor %}
-{{tab}}{{ model.name }}(
-{%- for p in c.params -%}
-{%- if p.type.stereotypes.const %}const {% endif -%}
-{%- if p.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if p.type.name %}{{ p.type.name }} {% endif -%}
-{%- if p.type.stereotypes.pointer %}*{% endif -%}
-{%- if p.type.stereotypes.lval_reference %}&{% endif -%}
-{%- if p.type.stereotypes.rval_reference %}&&{% endif -%}
-{{ p.name }}{% if not loop.last %}, {% endif %}
-{%- endfor -%}
-)
-{%- if c.type.stereotypes.noexcept %} noexcept{% endif -%};
+{{ utils.generate_class_constructor_h(c, model.name, tab) }}
 {% endfor %}
 
-{{tab}}/// @brief {{ model.destructor.description }}
-{{tab}}{%- if model.destructor.type.stereotypes.virtual or model.destructor.type.stereotypes.virtual_0 %}virtual {% endif -%}
-~{{ model.name }}()
-{%- if model.destructor.type.stereotypes.noexcept %} noexcept{% endif -%}
-{%- if model.destructor.type.stereotypes.virtual_0 %} = 0{% endif -%};
+{{ utils.generate_class_destructor_h(model.name, tab) }}
 
 // -- Members --
 {# Public members #}
 public:
 {% for m in model.members.public %}
 
-{{tab}}/// @brief {{ m.description }}
-{{tab}}{%- if m.type.stereotypes.static %}static {% endif -%}
-{%- if m.type.stereotypes.const %}const {% endif -%}
-{%- if m.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if m.type.name %}{{ m.type.name }} {% endif -%}
-{%- if m.type.stereotypes.pointer %}*{% endif -%}
-{%- if m.type.stereotypes.lval_reference %}&{% endif -%}
-{{ m.name }};
+{{ utils.generate_class_member_h(m, tab) }}
 {% endfor %}
 
 {# Protected members #}
 protected:
 {% for m in model.members.protected %}
 
-{{tab}}/// @brief {{ m.description }}
-{{tab}}{%- if m.type.stereotypes.static %}static {% endif -%}
-{%- if m.type.stereotypes.const %}const {% endif -%}
-{%- if m.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if m.type.name %}{{ m.type.name }} {% endif -%}
-{%- if m.type.stereotypes.pointer %}*{% endif -%}
-{%- if m.type.stereotypes.lval_reference %}&{% endif -%}
-{{ m.name }};
+{{ utils.generate_class_member_h(m, tab) }}
 {% endfor %}
 
 {# Private members #}
 private:
 {% for m in model.members.private %}
 
-{{tab}}/// @brief {{ m.description }}
-{{tab}}{%- if m.type.stereotypes.static %}static {% endif -%}
-{%- if m.type.stereotypes.const %}const {% endif -%}
-{%- if m.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if m.type.name %}{{ m.type.name }} {% endif -%}
-{%- if m.type.stereotypes.pointer %}*{% endif -%}
-{%- if m.type.stereotypes.lval_reference %}&{% endif -%}
-{{ m.name }};
+{{ utils.generate_class_member_h(m, tab) }}
 {% endfor %}
 
 // -- Methods --
@@ -104,90 +65,21 @@ private:
 public:
 {% for m in model.methods.public %}
 
-{{tab}}/// @brief {{ m.description }}
-{% for p in m.params %}
-{{tab}}/// @param {{ p.name }} {{ p.description }}
-{% endfor %}
-{{tab}}{%- if m.type.stereotypes.static %}static {% endif -%}
-{%- if m.type.stereotypes.virtual or m.type.stereotypes.virtual_0 %}virtual {% endif -%}
-{%- if m.type.stereotypes.const %}const {% endif -%}
-{%- if m.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if m.type.name %}{{ m.type.name }} {% endif -%}
-{{ m.name }}(
-{%- for p in m.params -%}
-{%- if p.type.stereotypes.const %}const {% endif -%}
-{%- if p.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if p.type.name %}{{ p.type.name }} {% endif -%}
-{%- if p.type.stereotypes.pointer %}*{% endif -%}
-{%- if p.type.stereotypes.lval_reference %}&{% endif -%}
-{%- if p.type.stereotypes.rval_reference %}&&{% endif -%}
-{{ p.name }}{% if not loop.last %}, {% endif %}
-{%- endfor -%}
-)
-{%- if m.type.stereotypes.immutable %} const{% endif -%}
-{%- if m.type.stereotypes.noexcept %} noexcept{% endif -%}
-{%- if m.type.stereotypes.override %} override{% endif -%}
-{%- if m.type.stereotypes.virtual_0 %} = 0{% endif -%};
+{{ utils.generate_class_method_h(m, tab) }}
 {% endfor %}
 
 {# Protected methods #}
 protected:
 {% for m in model.methods.protected %}
 
-{{tab}}/// @brief {{ m.description }}
-{% for p in m.params %}
-{{tab}}/// @param {{ p.name }} {{ p.description }}
-{% endfor %}
-{{tab}}{%- if m.type.stereotypes.static %}static {% endif -%}
-{%- if m.type.stereotypes.virtual or m.type.stereotypes.virtual_0 %}virtual {% endif -%}
-{%- if m.type.stereotypes.const %}const {% endif -%}
-{%- if m.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if m.type.name %}{{ m.type.name }} {% endif -%}
-{{ m.name }}(
-{%- for p in m.params -%}
-{%- if p.type.stereotypes.const %}const {% endif -%}
-{%- if p.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if p.type.name %}{{ p.type.name }} {% endif -%}
-{%- if p.type.stereotypes.pointer %}*{% endif -%}
-{%- if p.type.stereotypes.lval_reference %}&{% endif -%}
-{%- if p.type.stereotypes.rval_reference %}&&{% endif -%}
-{{ p.name }}{% if not loop.last %}, {% endif %}
-{%- endfor -%}
-)
-{%- if m.type.stereotypes.immutable %} const{% endif -%}
-{%- if m.type.stereotypes.noexcept %} noexcept{% endif -%}
-{%- if m.type.stereotypes.override %} override{% endif -%}
-{%- if m.type.stereotypes.virtual_0 %} = 0{% endif -%};
+{{ utils.generate_class_method_h(m, tab) }}
 {% endfor %}
 
 {# Private methods #}
 private:
 {% for m in model.methods.private %}
 
-{{tab}}/// @brief {{ m.description }}
-{% for p in m.params %}
-{{tab}}/// @param {{ p.name }} {{ p.description }}
-{% endfor %}
-{{tab}}{%- if m.type.stereotypes.static %}static {% endif -%}
-{%- if m.type.stereotypes.virtual or m.type.stereotypes.virtual_0 %}virtual {% endif -%}
-{%- if m.type.stereotypes.const %}const {% endif -%}
-{%- if m.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if m.type.name %}{{ m.type.name }} {% endif -%}
-{{ m.name }}(
-{%- for p in m.params -%}
-{%- if p.type.stereotypes.const %}const {% endif -%}
-{%- if p.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if p.type.name %}{{ p.type.name }} {% endif -%}
-{%- if p.type.stereotypes.pointer %}*{% endif -%}
-{%- if p.type.stereotypes.lval_reference %}&{% endif -%}
-{%- if p.type.stereotypes.rval_reference %}&&{% endif -%}
-{{ p.name }}{% if not loop.last %}, {% endif %}
-{%- endfor -%}
-)
-{%- if m.type.stereotypes.immutable %} const{% endif -%}
-{%- if m.type.stereotypes.noexcept %} noexcept{% endif -%}
-{%- if m.type.stereotypes.override %} override{% endif -%}
-{%- if m.type.stereotypes.virtual_0 %} = 0{% endif -%};
+{{ utils.generate_class_method_h(m, tab) }}
 {% endfor %}
 
 }; // class {{ model.name }}

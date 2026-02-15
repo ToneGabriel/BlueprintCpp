@@ -1,19 +1,30 @@
-description: "Class description"
+description: Class description
 
 
+# ================================================
+# Inheritance
+# ================================================
 inherits:
   # ------------------------
-  - base: project::Module1
-    visibility: "public"
+  - base: base::BaseModule
+    visibility: public
     virtual: false
   # ------------------------
   - base: interfaces::IRuntime
-    visibility: "public"
+    visibility: public
     virtual: true
   # ------------------------
   - base: interfaces::IModuleType1
-    visibility: "public"
+    visibility: public
     virtual: true
+
+
+# ================================================
+# Constructors
+# ================================================
+constructors:
+  - description: Constructor description
+    params: []
 
 
 # ================================================
@@ -22,18 +33,19 @@ inherits:
 members:
   # ------------------------
   - name: id
+    description: Member description
+    visibility: private
     type:
       name: int
       stereotypes: []
-    visibility: private
-    description: Member description
   # ------------------------
   - name: name
+    description: Member description
+    visibility: public
     type:
       name: std::string
       stereotypes: []
-    visibility: public
-    description: Member description
+  # ------------------------
 
 
 # ================================================
@@ -42,27 +54,31 @@ members:
 methods:
   # ------------------------
   - name: Start
+    description: Method description
     visibility: public
     type:
       name: void
       stereotypes: []
     params: []
-    description: Method description
   # ------------------------
   - name: SetName
+    description: Method description
     visibility: protected
     type:
       name: void
-      stereotypes: [const, immutable, noexcept, override, virtual, virtual_0]
+      stereotypes: [const, immutable, noexcept, override]
     params:
+      # ------------------------
       - name: new_name
+        description: Param description
         type:
           name: std::string
           stereotypes: [const, lval_reference]
-        description: Param description
+      # ------------------------
       - name: flag
+        description: Param description
         type:
           name: int
           stereotypes: []
-        description: Param description
-    description: Method description
+      # ------------------------
+  # ------------------------

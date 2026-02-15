@@ -1,0 +1,26 @@
+{% import "utils.j2" as utils %}
+#ifndef {{ model.include_guard }}
+#define {{ model.include_guard }}
+
+
+{% for ns in model.namespaces %}
+namespace {{ ns }} {
+{% endfor %}
+
+
+{# Enum start #}
+/// @brief {{ model.description }}
+enum class {{ model.name }}
+{
+
+}; // enum class {{ model.name }}
+{# Class end #}
+
+
+{% for ns in model.namespaces | reverse %}
+} // namespace {{ ns }}
+{% endfor %}
+
+
+#endif // {{ model.include_guard }}
+

@@ -1,0 +1,53 @@
+{% import "utils.j2" as utils %}
+#ifndef {{ model.include_guard }}
+#define {{ model.include_guard }}
+
+
+// System includes
+{% for inc in model.includes_h.system %}
+#include <{{ inc }}>
+{% endfor %}
+
+// Project includes
+{% for inc in model.includes_h.project %}
+#include "{{ inc }}"
+{% endfor %}
+
+
+{% for ns in model.namespaces %}
+namespace {{ ns }} {
+{% endfor %}
+
+
+{# Class start #}
+/// @brief {{ model.description }}
+class {{ model.name }}{% if model.inherits %} :
+{% for b in model.inherits %}
+{{ tab }}{% if b.virtual %}virtual {% endif -%}
+{{ b.visibility }} {{ b.name }}{% if not loop.last %},{% endif %}
+
+{% endfor %}
+{% endif %}
+{
+// -- Destructor --
+public:
+{{ utils.generate_interface_destructor_h(model.name, tab) }}
+
+// -- Methods --
+public:
+{% for m in model.methods.public %}
+
+{{ utils.generate_interface_method_h(m, tab) }}
+{% endfor %}
+
+}; // class {{ model.name }}
+{# Class end #}
+
+
+{% for ns in model.namespaces | reverse %}
+} // namespace {{ ns }}
+{% endfor %}
+
+
+#endif // {{ model.include_guard }}
+

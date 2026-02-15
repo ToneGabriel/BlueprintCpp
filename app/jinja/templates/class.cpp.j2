@@ -1,3 +1,4 @@
+{% import "utils.j2" as utils %}
 #include "{{ model.name }}.h"
 
 
@@ -6,60 +7,33 @@ namespace {{ ns }} {
 {% endfor %}
 
 
+// -- Constructors & Destructor --
+{% for c in model.constructors %}
+
+{{ utils.generate_class_constructor_cpp(c, model.name, tab) }}
+{% endfor %}
+
+{{ utils.generate_class_destructor_cpp(model.name, tab) }}
+
 {# Public methods #}
-// Public Methods
-
+// -- Public Methods --
 {% for m in model.methods.public %}
-{%- if m.return_type %}{{ m.return_type }} {% endif -%}
-{{ model.name }}::{{ m.name }}(
-{%- for p in m.params -%}
-{{ p.type }} {{ p.name }}{% if not loop.last %}, {% endif %}
-{%- endfor -%}
-)
-{%- if m.stereotypes.const %} const{% endif -%}
-{%- if m.stereotypes.noexcept %} noexcept{% endif %}
 
-{
-{{tab}}// TODO: implement
-}
-
+{{ utils.generate_class_method_cpp(m, model.name, tab) }}
 {% endfor %}
 
 {# Protected methods #}
-// Protected Methods
-
+// -- Protected Methods --
 {% for m in model.methods.protected %}
-{%- if m.return_type %}{{ m.return_type }} {% endif -%}
-{{ model.name }}::{{ m.name }}(
-{%- for p in m.params -%}
-{{ p.type }} {{ p.name }}{% if not loop.last %}, {% endif %}
-{%- endfor -%}
-)
-{%- if m.stereotypes.const %} const{% endif -%}
-{%- if m.stereotypes.noexcept %} noexcept{% endif %}
 
-{
-{{tab}}// TODO: implement
-}
-
+{{ utils.generate_class_method_cpp(m, model.name, tab) }}
 {% endfor %}
 
 {# Private methods #}
-// Private Methods
-
+// -- Private Methods --
 {% for m in model.methods.private %}
-{%- if m.return_type %}{{ m.return_type }} {% endif -%}
-{{ model.name }}::{{ m.name }}(
-{%- for p in m.params -%}
-{{ p.type }} {{ p.name }}{% if not loop.last %}, {% endif %}
-{%- endfor -%}
-)
-{%- if m.stereotypes.const %} const{% endif -%}
-{%- if m.stereotypes.noexcept %} noexcept{% endif %}
 
-{
-{{tab}}// TODO: implement
-}
+{{ utils.generate_class_method_cpp(m, model.name, tab) }}
 {% endfor %}
 
 
