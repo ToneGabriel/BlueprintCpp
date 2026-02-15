@@ -1,4 +1,7 @@
 {% import "utils.j2" as utils %}
+// --------------------------------------------------
+// Source includes
+// --------------------------------------------------
 #include "{{ model.name }}.h"
 
 
@@ -7,7 +10,9 @@ namespace {{ ns }} {
 {% endfor %}
 
 
+// --------------------------------------------------
 // -- Constructors & Destructor --
+// --------------------------------------------------
 {% for c in model.constructors %}
 
 {{ utils.generate_class_constructor_cpp(c, model.name, tab) }}
@@ -15,22 +20,25 @@ namespace {{ ns }} {
 
 {{ utils.generate_class_destructor_cpp(model.name, tab) }}
 
-{# Public methods #}
+// --------------------------------------------------
 // -- Public Methods --
+// --------------------------------------------------
 {% for m in model.methods.public %}
 
 {{ utils.generate_class_method_cpp(m, model.name, tab) }}
 {% endfor %}
 
-{# Protected methods #}
+// --------------------------------------------------
 // -- Protected Methods --
+// --------------------------------------------------
 {% for m in model.methods.protected %}
 
 {{ utils.generate_class_method_cpp(m, model.name, tab) }}
 {% endfor %}
 
-{# Private methods #}
+// --------------------------------------------------
 // -- Private Methods --
+// --------------------------------------------------
 {% for m in model.methods.private %}
 
 {{ utils.generate_class_method_cpp(m, model.name, tab) }}

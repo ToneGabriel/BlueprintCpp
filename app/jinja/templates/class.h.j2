@@ -3,12 +3,12 @@
 #define {{ model.include_guard }}
 
 
-// System includes
+// --------------------------------------------------
+// Header includes
+// --------------------------------------------------
 {% for inc in model.includes_h.system %}
 #include <{{ inc }}>
 {% endfor %}
-
-// Project includes
 {% for inc in model.includes_h.project %}
 #include "{{ inc }}"
 {% endfor %}
@@ -29,7 +29,10 @@ class {{ model.name }}{% if model.inherits %} :
 {% endfor %}
 {% endif %}
 {
+
+// --------------------------------------------------
 // -- Constructors & Destructor --
+// --------------------------------------------------
 public:
 {% for c in model.constructors %}
 
@@ -38,44 +41,54 @@ public:
 
 {{ utils.generate_class_destructor_h(model.name, tab) }}
 
-// -- Members --
-{# Public members #}
+// --------------------------------------------------
+// -- Public Members --
+// --------------------------------------------------
 public:
 {% for m in model.members.public %}
 
 {{ utils.generate_class_member_h(m, tab) }}
 {% endfor %}
 
-{# Protected members #}
+// --------------------------------------------------
+// -- Protected Members --
+// --------------------------------------------------
 protected:
 {% for m in model.members.protected %}
 
 {{ utils.generate_class_member_h(m, tab) }}
 {% endfor %}
 
-{# Private members #}
+// --------------------------------------------------
+// -- Private Members --
+// --------------------------------------------------
 private:
 {% for m in model.members.private %}
 
 {{ utils.generate_class_member_h(m, tab) }}
 {% endfor %}
 
-// -- Methods --
-{# Public methods #}
+// --------------------------------------------------
+// -- Public Methods --
+// --------------------------------------------------
 public:
 {% for m in model.methods.public %}
 
 {{ utils.generate_class_method_h(m, tab) }}
 {% endfor %}
 
-{# Protected methods #}
+// --------------------------------------------------
+// -- Protected Methods --
+// --------------------------------------------------
 protected:
 {% for m in model.methods.protected %}
 
 {{ utils.generate_class_method_h(m, tab) }}
 {% endfor %}
 
-{# Private methods #}
+// --------------------------------------------------
+// -- Private Methods --
+// --------------------------------------------------
 private:
 {% for m in model.methods.private %}
 
