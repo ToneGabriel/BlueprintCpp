@@ -1,0 +1,35 @@
+# pyproject.toml
+
+[project]
+name = "app"
+version = "0.0.0"
+description = "C++ code generator"
+readme = "README.md"
+requires-python = ">=3.10.12"
+keywords = ["python", "jinja", "pyinstaller", "templates"]
+classifiers = [
+    "Programming Language :: Python :: 3.10.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+# Dependencies required to run your app
+dependencies = [
+    "jinja2",
+    "pyyaml"
+]
+
+# Optional: dev dependencies (for testing, building)
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+# Use src layout
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

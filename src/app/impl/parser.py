@@ -1,4 +1,4 @@
-from .model import Stereotype, Visibility, ParameterType, Inheritance, Parameter, Method, EnumValue, Model
+from app.impl.model import Stereotype, Visibility, ParameterType, Inheritance, Parameter, Method, EnumValue, Model
 import yaml
 from typing import Any
 
@@ -113,9 +113,31 @@ class Parser:
             self._model.add_enum_value(evalue)
 
     def _check_includes(self, typedef: str) -> None:
-        if (typedef in self._standard_include_map):
-            self._model.add_system_include_h(self._standard_include_map[typedef])
-        elif (typedef in self._project_include_map):
+        std_types: list[str] = self._extract_std_types(typedef)
+
+        for t in std_types:
+            if (t in self._standard_include_map):
+                self._model.add_system_include_h(self._standard_include_map[t])
+
+        if (typedef in self._project_include_map):
             self._model.add_project_include_h(self._project_include_map[typedef])
-        else:
-            pass
+    
+    def _extract_std_types(self, typedef: str) -> list[str]:
+        results = []
+        i = 0
+        n = len(typedef)
+
+        while i < n:
+            if typedef.startswith("std::", i):
+                start = i
+                i += 5  # skip "std::"
+
+                # Read full identifier (including nested namespaces)
+                while i < n and (typedef[i].isalnum() or typedef[i] in "_:"):
+                    i += 1
+
+                results.append(typedef[start:i])
+            else:
+                i += 1
+
+        return results

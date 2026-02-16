@@ -1,12 +1,11 @@
 #!/bin/bash
 
 DEST_PATH="$(pwd)/.pyinstaller.out"
-TMP_PATH="$(pwd)/app/templates:templates"
 
-pyinstaller --onefile \
+pyinstaller --onedir \
             --name=blueprintcpp \
-            --add-data "$TMP_PATH" \
+            --add-data "$(pwd)/src/app/jinja/templates:app/jinja/templates" \
             --distpath "$DEST_PATH/dist" \
             --workpath "$DEST_PATH/build" \
             --specpath "$DEST_PATH" \
-            "$(pwd)/app/__main__.py"
+            "$(pwd)/src/app/__main__.py"

@@ -3,18 +3,12 @@ ARG BASE_IMAGE=ubuntu:latest
 
 FROM ${BASE_IMAGE}
 
-ARG PLANTUML_VERSION
-ARG PLANTUML_PATH
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install required packages
 RUN apt-get update                                          &&  \
     apt-get upgrade -y                                      &&  \
     apt-get install -y --no-install-recommends                  \
-        # for c and cpp
-        clang                                                   \
-        # for python
         binutils                                                \
         git                                                     \
         wget                                                    \
@@ -24,10 +18,6 @@ RUN apt-get update                                          &&  \
         python3-setuptools                                      \
         python3-venv                                            \
         libpython3.10                                           \
-        # for plantuml
-        openjdk-17-jre-headless                                 \
-        graphviz                                                \
-        # for locales
         locales                                             &&  \
     locale-gen en_US.UTF-8                                  &&  \
     update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8       &&  \
@@ -36,14 +26,6 @@ RUN apt-get update                                          &&  \
 
 # Install Python packages for code generation (jinja2)
 RUN pip3 install --no-cache-dir         \
-        tree-sitter==0.21.3             \
-        tree-sitter-languages==1.10.2   \
-        clang==14.*                     \
         jinja2                          \
         pyyaml                          \
         pyinstaller
-
-# Download plantuml.jar
-RUN mkdir -p ${PLANTUML_PATH} && \
-    wget -q -O ${PLANTUML_PATH}/plantuml.jar https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml.jar
-

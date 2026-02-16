@@ -1,5 +1,5 @@
-import impl
-import config
+import app.impl as impl
+import app.config as config
 
 import argparse
 from enum import Enum

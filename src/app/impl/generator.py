@@ -1,4 +1,4 @@
-from .model import Model
+from app.impl.model import Model
 from jinja2 import Environment, PackageLoader, Template
 
 

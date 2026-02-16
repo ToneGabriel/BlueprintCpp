@@ -6,10 +6,7 @@
         "dockerfile": "../.containers/Dockerfile.dev",
         "args":
         {
-            "BASE_IMAGE": "ubuntu:22.04",
-
-            "PLANTUML_VERSION": "1.2025.10",
-            "PLANTUML_PATH": "/opt/plantuml"
+            "BASE_IMAGE": "ubuntu:22.04"
         }
     },
 
@@ -23,7 +20,6 @@
             [
                 "ms-python.python",
                 "wholroyd.jinja",
-                "jebbs.plantuml",
                 "editorconfig.editorconfig",
                 "gruntfuggly.todo-tree"
             ],
@@ -31,9 +27,7 @@
             {
                 "terminal.integrated.shell.linux": "/bin/bash",
                 "editor.formatOnSave": false,
-                "files.autoSave": "onFocusChange",
-                "plantuml.java": "/usr/bin/java",
-                "plantuml.jar": "/opt/plantuml/plantuml.jar"
+                "files.autoSave": "onFocusChange"
             }
         }
     }
