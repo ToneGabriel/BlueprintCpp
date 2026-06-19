@@ -13,16 +13,17 @@ RELEASE_PATH="$BUILD_DIR/dist/blueprintcpp/"
 RELEASE_NAME="blueprintcpp"
 
 
-if [ "$1" == "clean" ]; then
-    echo "Cleaning build artifacts..."
+if [ "$1" == "clear" ]; then
+    echo "Clearing build artifacts..."
 
     rm -rf "$BUILD_DIR"
 
-    echo "Clean complete"
+    echo "Clear complete"
 else
     echo "Creating build artifacts..."
 
     pyinstaller --onedir                                            \
+                --noconfirm                                         \
                 --name="$RELEASE_NAME"                              \
                 --add-data "$TEMPLATES_DIR:$TEMPLATES_PACKAGE_DIR"  \
                 --distpath "$DIST_DIR"                              \

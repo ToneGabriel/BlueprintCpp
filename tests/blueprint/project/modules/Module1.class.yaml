@@ -10,11 +10,7 @@ inherits:
     visibility: public
     virtual: false
   # ------------------------
-  - base: interfaces::IRuntime
-    visibility: public
-    virtual: true
-  # ------------------------
-  - base: interfaces::IModuleType1
+  - base: interfaces::IModule
     visibility: public
     virtual: true
 

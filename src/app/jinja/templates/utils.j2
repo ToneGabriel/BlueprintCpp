@@ -34,7 +34,7 @@
 )
 {%- if method.type.stereotypes.immutable %} const{% endif -%}
 {%- if method.type.stereotypes.noexcept %} noexcept{% endif -%}
-{%- if method.type.stereotypes.override %} override{% endif -%};
+{%- if method.type.stereotypes.override %} override{% endif %};
 {%- endmacro %}
 
 
@@ -136,7 +136,8 @@
 {% for p in method.params %}
 {{tab}}/// @param {{ p.name }} {{ p.description }}
 {% endfor %}
-{{tab}}virtual {%- if method.type.stereotypes.const %}const {% endif -%}
+{{tab}}{%- if true %}virtual {% endif -%}
+{%- if method.type.stereotypes.const %}const {% endif -%}
 {%- if method.type.stereotypes.volatile %}volatile {% endif -%}
 {%- if method.type.name %}{{ method.type.name }} {% endif -%}
 {{ method.name }}(
@@ -151,7 +152,7 @@
 {%- endfor -%}
 )
 {%- if method.type.stereotypes.immutable %} const{% endif -%}
-{%- if method.type.stereotypes.noexcept %} noexcept{% endif -%} = 0;
+{%- if method.type.stereotypes.noexcept %} noexcept{% endif %} = 0;
 {%- endmacro %}
 
 

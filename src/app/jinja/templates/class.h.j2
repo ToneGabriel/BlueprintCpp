@@ -27,8 +27,11 @@ class {{ model.name }}{% if model.inherits %} :
 {{ b.visibility }} {{ b.name }}{% if not loop.last %},{% endif %}
 
 {% endfor %}
-{% endif %}
 {
+{% else %}
+
+{
+{% endif %}
 
 // --------------------------------------------------
 // -- Constructors & Destructor --

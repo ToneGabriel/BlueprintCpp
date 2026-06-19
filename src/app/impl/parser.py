@@ -19,7 +19,7 @@ class Parser:
         self._project_include_map[typename] = include
 
     def parse_yaml(self, yaml_text: str) -> None:
-        data = yaml.safe_load(yaml_text)
+        data = yaml.safe_load(yaml_text) or {}
 
         self._model.set_description(data.get("description", "Model description"))
 
