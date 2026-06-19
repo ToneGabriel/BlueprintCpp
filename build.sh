@@ -1,11 +1,37 @@
 #!/bin/bash
 
-DEST_PATH="$(pwd)/.pyinstaller.out"
+BUILD_DIR="$(pwd)/.pyinstaller.out"
+DIST_DIR="$BUILD_DIR/dist"
+WORK_DIR="$BUILD_DIR/build"
+MAIN_FILE="$(pwd)/src/app/__main__.py"
 
-pyinstaller --onedir \
-            --name=blueprintcpp \
-            --add-data "$(pwd)/src/app/jinja/templates:app/jinja/templates" \
-            --distpath "$DEST_PATH/dist" \
-            --workpath "$DEST_PATH/build" \
-            --specpath "$DEST_PATH" \
-            "$(pwd)/src/app/__main__.py"
+TEMPLATES_DIR="$(pwd)/src/app/jinja/templates"
+TEMPLATES_PACKAGE_DIR="app/jinja/templates"
+
+RELEASE_ZIP_NAME="blueprintcpp-linux-x86_64.zip"
+RELEASE_PATH="$BUILD_DIR/dist/blueprintcpp/"
+RELEASE_NAME="blueprintcpp"
+
+
+if [ "$1" == "clean" ]; then
+    echo "Cleaning build artifacts..."
+
+    rm -rf "$BUILD_DIR"
+
+    echo "Clean complete"
+else
+    echo "Creating build artifacts..."
+
+    pyinstaller --onedir                                            \
+                --name="$RELEASE_NAME"                              \
+                --add-data "$TEMPLATES_DIR:$TEMPLATES_PACKAGE_DIR"  \
+                --distpath "$DIST_DIR"                              \
+                --workpath "$WORK_DIR"                              \
+                --specpath "$BUILD_DIR"                             \
+                "$MAIN_FILE"
+
+    cd "$DIST_DIR"
+    zip -r -X "$RELEASE_ZIP_NAME" "$RELEASE_NAME"
+
+    echo "Done"
+fi
