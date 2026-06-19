@@ -2,43 +2,7 @@ import app.impl as impl
 import app.config as config
 
 import argparse
-from enum import Enum
 from pathlib import Path
-
-
-class ModelClassification(Enum):
-    CLASS       = "class"
-    INTERFACE   = "interface"
-    ENUM        = "enum"
-
-
-class ModelInfo:
-    def __init__(self,
-                 model_name: str,
-                 model_type: str,
-                 model_namespaces: list[str],
-                 model_include_guard: str
-                 ):
-        self._name: str                             = model_name
-        self._classification: ModelClassification   = ModelClassification(model_type)
-        self._namespaces: list[str]                 = model_namespaces
-        self._include_guard: str                    = model_include_guard
-
-    @property
-    def name(self) -> str:
-        return self._name
-    
-    @property
-    def classification(self) -> ModelClassification:
-        return self._classification
-    
-    @property
-    def namespaces(self) -> list[str]:
-        return self._namespaces
-    
-    @property
-    def include_guard(self) -> str:
-        return self._include_guard
 
 
 # Create generator
@@ -87,7 +51,7 @@ def main() -> None:
     create_backup: bool = args.backup
 
     # Instrument files
-    file_models_info: dict[str, ModelInfo] = {}
+    file_models_info: dict[str, impl.ModelInfo] = {}
     for yaml_path in input_path.rglob("*.yaml"):
         relative_dir = yaml_path.parent.relative_to(input_path)
         base_name, model_type = yaml_path.stem.rsplit(".", 1)
@@ -102,11 +66,11 @@ def main() -> None:
         include_guard = "_".join(s.upper() for s in include_guard_parts)
 
         PARSER.add_project_include(typename, str(h_path))
-        file_models_info[yaml_path] = ModelInfo(base_name, model_type, namespaces, include_guard)
+        file_models_info[yaml_path] = impl.ModelInfo(base_name, model_type, namespaces, include_guard)
 
     # Parse yamls and generate files
     for yaml_path in input_path.rglob("*.yaml"):
-        model_info: ModelInfo = file_models_info[yaml_path]
+        model_info: impl.ModelInfo = file_models_info[yaml_path]
 
         # Create general model
         model: impl.Model = impl.Model(model_info.name, model_info.namespaces, model_info.include_guard)
@@ -125,14 +89,14 @@ def main() -> None:
         PARSER.parse_yaml(yaml_path.read_text())
 
         match model_info.classification:
-            case ModelClassification.CLASS:
+            case impl.ModelClassification.CLASS:
                 # Generate text for header and cpp
                 header_content: str = GENERATOR.generate_class_header_content(model)
                 source_content: str = GENERATOR.generate_class_source_content(model)
-            case ModelClassification.INTERFACE:
+            case impl.ModelClassification.INTERFACE:
                 header_content: str = GENERATOR.generate_interface_header_content(model)
                 source_content: str = None
-            case ModelClassification.ENUM:
+            case impl.ModelClassification.ENUM:
                 header_content: str = GENERATOR.generate_enum_header_content(model)
                 source_content: str = None
 

@@ -1,7 +1,7 @@
 from typing import Any
 from enum import Enum
 
-
+# ==============================================================================
 class Stereotype(Enum):
     CONST           = "const"
     IMMUTABLE       = "immutable"
@@ -15,12 +15,14 @@ class Stereotype(Enum):
     RVAL_REFERENCE  = "rval_reference"
 
 
+# ==============================================================================
 class Visibility(Enum):
     PUBLIC      = "public"
     PROTECTED   = "protected"
     PRIVATE     = "private"
 
 
+# ==============================================================================
 class ParameterType:
     def __init__(self, name: str):
         self._type: dict[str, Any] =    {
@@ -37,6 +39,7 @@ class ParameterType:
         self._type["stereotypes"][stereotype.value] = True
 
 
+# ==============================================================================
 class Parameter:
     def __init__(self,
                  name: str,
@@ -59,6 +62,7 @@ class Parameter:
         self._param["type"] = type.value
 
 
+# ==============================================================================
 class Method:
     def __init__(self,
                  name: str,
@@ -85,6 +89,7 @@ class Method:
         self._method["params"].append(param.value)
 
 
+# ==============================================================================
 class Inheritance:
     def __init__(self,
                  name: str,
@@ -103,6 +108,7 @@ class Inheritance:
         return self._inheritance
 
 
+# ==============================================================================
 class EnumValue:
     def __init__(self,
                  name: str,
@@ -118,6 +124,7 @@ class EnumValue:
         return self._evalue
 
 
+# ==============================================================================
 class Model:
     def __init__(self, name: str, namespaces: list[str], include_guard: str):
 
