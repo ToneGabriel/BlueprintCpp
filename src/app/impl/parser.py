@@ -31,9 +31,9 @@ class Parser:
 
     def _parse_inheritances(self, inheritances: list[dict[str, Any]]) -> None:
         for i in inheritances:
-            inheritance = Inheritance(i.get("base", "void"), Visibility(i.get("visibility", "public")), i.get("virtual", False))
+            inheritance = Inheritance(i.get("type", "void"), Visibility(i.get("visibility", "public")), i.get("virtual", False))
             self._model.add_inheritance(inheritance)
-            self._check_includes(i.get("base", "void"))
+            self._check_includes(i.get("type", "void"))
 
     def _parse_members(self, members_data: list[dict[str, Any]]) -> None:
         for m in members_data:

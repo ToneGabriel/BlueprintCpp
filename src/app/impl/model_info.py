@@ -24,15 +24,15 @@ class ModelInfo:
     @property
     def name(self) -> str:
         return self._name
-    
+
     @property
     def classification(self) -> ModelClassification:
         return self._classification
-    
+
     @property
     def namespaces(self) -> list[str]:
         return self._namespaces
-    
+
     @property
     def include_guard(self) -> str:
         return self._include_guard

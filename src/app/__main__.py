@@ -5,22 +5,6 @@ import argparse
 from pathlib import Path
 
 
-# Create generator
-GENERATOR = impl.CppGenerator(
-    config.JINJA_ENV_PACKAGE,
-    config.CLASS_HEADER_TEMPLATE_FILENAME,
-    config.CLASS_SOURCE_TEMPLATE_FILENAME,
-    config.INTERFACE_HEADER_TEMPLATE_FILENAME,
-    config.ENUM_HEADER_TEMPLATE_FILENAME
-)
-
-
-# Create Parser
-PARSER = impl.Parser(
-    config.STANDARD_INCLUDE_MAP
-)
-
-
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate C++ code from YAML")
 
@@ -44,11 +28,26 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def main() -> None:
+    # Parse executable arguments
     args = parse_arguments()
 
     input_path: Path    = Path(args.input).resolve()
     output_path: Path   = Path(args.output).resolve()
     create_backup: bool = args.backup
+
+    # Create generator
+    GENERATOR = impl.CppGenerator(
+        config.JINJA_ENV_PACKAGE,
+        config.CLASS_HEADER_TEMPLATE_FILENAME,
+        config.CLASS_SOURCE_TEMPLATE_FILENAME,
+        config.INTERFACE_HEADER_TEMPLATE_FILENAME,
+        config.ENUM_HEADER_TEMPLATE_FILENAME
+    )
+
+    # Create Parser
+    PARSER = impl.Parser(
+        config.STANDARD_INCLUDE_MAP
+    )
 
     # Instrument files
     file_models_info: dict[str, impl.ModelInfo] = {}

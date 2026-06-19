@@ -6,11 +6,11 @@ description: Class description
 # ================================================
 inherits:
   # ------------------------
-  - base: base::BaseModule
+  - type: base::BaseModule
     visibility: public
     virtual: false
   # ------------------------
-  - base: interfaces::IModule
+  - type: interfaces::IModule
     visibility: public
     virtual: true
 

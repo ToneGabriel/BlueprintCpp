@@ -12,27 +12,14 @@ RELEASE_ZIP_NAME="blueprintcpp-linux-x86_64.zip"
 RELEASE_PATH="$BUILD_DIR/dist/blueprintcpp/"
 RELEASE_NAME="blueprintcpp"
 
+pyinstaller --onedir                                            \
+            --noconfirm                                         \
+            --name="$RELEASE_NAME"                              \
+            --add-data "$TEMPLATES_DIR:$TEMPLATES_PACKAGE_DIR"  \
+            --distpath "$DIST_DIR"                              \
+            --workpath "$WORK_DIR"                              \
+            --specpath "$BUILD_DIR"                             \
+            "$MAIN_FILE"
 
-if [ "$1" == "clear" ]; then
-    echo "Clearing build artifacts..."
-
-    rm -rf "$BUILD_DIR"
-
-    echo "Clear complete"
-else
-    echo "Creating build artifacts..."
-
-    pyinstaller --onedir                                            \
-                --noconfirm                                         \
-                --name="$RELEASE_NAME"                              \
-                --add-data "$TEMPLATES_DIR:$TEMPLATES_PACKAGE_DIR"  \
-                --distpath "$DIST_DIR"                              \
-                --workpath "$WORK_DIR"                              \
-                --specpath "$BUILD_DIR"                             \
-                "$MAIN_FILE"
-
-    cd "$DIST_DIR"
-    zip -r -X "$RELEASE_ZIP_NAME" "$RELEASE_NAME"
-
-    echo "Done"
-fi
+cd "$DIST_DIR"
+zip -r -X "$RELEASE_ZIP_NAME" "$RELEASE_NAME"
