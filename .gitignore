@@ -35,6 +35,9 @@ MANIFEST
 *.exe
 *.zip
 
+# Generated files for test
+generated
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
