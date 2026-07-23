@@ -1,37 +1,34 @@
-description: Interface description
+description: Class description
 
 
-# ================================================
+# ================================================================================================
 # Methods
-# ================================================
+# ================================================================================================
 methods:
   # ------------------------
   - name: Start
-    description: Method description
-    visibility: public
-    type:
-      name: void
-      stereotypes: []
-    params: []
+    description: Start the module
+    type: void
   # ------------------------
   - name: SetName
-    description: Method description
-    visibility: public
-    type:
-      name: void
-      stereotypes: [const, immutable, noexcept, override]
+    description: Set new module name
+    type: void
+    indirection: "*"
+    const: true
+    volatile: true
+    immutable: true
+    noexcept: true
+    override: true
     params:
       # ------------------------
       - name: new_name
-        description: Param description
-        type:
-          name: std::string
-          stereotypes: [const, lval_reference]
+        description: New name to be set
+        type: std::string
+        const: true
+        indirection: "&"
       # ------------------------
       - name: flag
-        description: Param description
-        type:
-          name: int
-          stereotypes: []
+        description: This is a flag
+        type: int
       # ------------------------
   # ------------------------

@@ -1,19 +1,6 @@
 from typing import Any
 from enum import Enum
 
-# ==============================================================================
-class Stereotype(Enum):
-    CONST           = "const"
-    IMMUTABLE       = "immutable"
-    VOLATILE        = "volatile"
-    NOEXCEPT        = "noexcept"
-    OVERRIDE        = "override"
-    STATIC          = "static"
-    ARRAY           = "array"
-    POINTER         = "pointer"
-    LVAL_REFERENCE  = "lval_reference"
-    RVAL_REFERENCE  = "rval_reference"
-
 
 # ==============================================================================
 class Visibility(Enum):
@@ -23,67 +10,62 @@ class Visibility(Enum):
 
 
 # ==============================================================================
-class ParameterType:
-    def __init__(self, name: str):
-        self._type: dict[str, Any] =    {
-                                            "name": name,
-                                            "stereotypes":  {
-                                                                s.value: False for s in Stereotype
-                                                            }
-                                        }
-    @property
-    def value(self) -> dict[str, Any]:
-        return self._type
-
-    def add_stereotype(self, stereotype: Stereotype) -> None:
-        self._type["stereotypes"][stereotype.value] = True
-
-
-# ==============================================================================
 class Parameter:
     def __init__(self,
-                 name: str,
-                 description: str
+                 name: str = "_defaultMember",
+                 description: str = "Parameter description",
+                 type: str = "void",
+                 indirection: str = None,
+                 const: bool = False,
+                 volatile: bool = False,
+                 default: str = ""
                  ):
 
         self._param: dict[str, Any] =   {
                                             "name": name,
-                                            "type": {},
-                                            "description": description
+                                            "description": description,
+                                            "type": type,
+                                            "indirection": indirection,
+                                            "const": const,
+                                            "volatile": volatile,
+                                            "default": default
                                         }
-
-        self.set_type(ParameterType("void"))
 
     @property
     def value(self) -> dict[str, Any]:
         return self._param
-    
-    def set_type(self, type: ParameterType) -> None:
-        self._param["type"] = type.value
 
 
 # ==============================================================================
 class Method:
     def __init__(self,
-                 name: str,
-                 description: str
+                 name: str = "_DefaultMethod",
+                 description: str = "Method description",
+                 type: str = "void",
+                 indirection: str = None,
+                 const: bool = False,
+                 volatile: bool = False,
+                 immutable: bool = False,
+                 noexcept: bool = False,
+                 override: bool = False,
                  ):
 
         self._method: dict[str, Any] = {
                                             "name": name,
-                                            "type": {},
                                             "description": description,
+                                            "type": type,
+                                            "indirection": indirection,
+                                            "const": const,
+                                            "volatile": volatile,
+                                            "immutable": immutable,
+                                            "noexcept": noexcept,
+                                            "override": override,
                                             "params": []
                                         }
-
-        self.set_type(ParameterType("void"))
 
     @property
     def value(self) -> dict[str, Any]:
         return self._method
-
-    def set_type(self, type: ParameterType) -> None:
-        self._method["type"] = type.value
 
     def add_parameter(self, param: Parameter) -> None:
         self._method["params"].append(param.value)

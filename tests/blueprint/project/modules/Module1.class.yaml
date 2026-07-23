@@ -1,9 +1,9 @@
 description: Class description
 
 
-# ================================================
+# ================================================================================================
 # Inheritance
-# ================================================
+# ================================================================================================
 inherits:
   # ------------------------
   - type: base::BaseModule
@@ -15,66 +15,65 @@ inherits:
     virtual: true
 
 
-# ================================================
+# ================================================================================================
 # Constructors
-# ================================================
+# ================================================================================================
 constructors:
   - description: Constructor description
     params: []
 
 
-# ================================================
+# ================================================================================================
 # Members
-# ================================================
+# ================================================================================================
 members:
   # ------------------------
   - name: id
     description: Member description
     visibility: private
-    type:
-      name: int
-      stereotypes: []
+    type: int
+    indirection: "*"
+    const: true
+    volatile: false
+    default: "nullptr"
   # ------------------------
   - name: name
     description: Member description
     visibility: public
-    type:
-      name: std::string
-      stereotypes: []
+    type: std::string
   # ------------------------
 
 
-# ================================================
+# ================================================================================================
 # Methods
-# ================================================
+# ================================================================================================
 methods:
   # ------------------------
   - name: Start
     description: Method description
     visibility: public
-    type:
-      name: void
-      stereotypes: []
-    params: []
+    type: void
   # ------------------------
   - name: SetName
     description: Method description
     visibility: protected
-    type:
-      name: void
-      stereotypes: [const, immutable, noexcept, override]
+    type: void
+    indirection: "*"
+    const: true
+    volatile: true
+    immutable: true
+    noexcept: true
+    override: true
     params:
       # ------------------------
       - name: new_name
         description: Param description
-        type:
-          name: std::string
-          stereotypes: [const, lval_reference]
+        type: std::string
+        const: true
+        indirection: "&"
       # ------------------------
       - name: flag
         description: Param description
-        type:
-          name: int
-          stereotypes: []
+        type: int
       # ------------------------
   # ------------------------

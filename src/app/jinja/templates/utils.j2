@@ -9,13 +9,9 @@
 {# =================== Class Member H =================== #}
 {% macro generate_class_member_h(member, tab) -%}
 {{tab}}/// @brief {{ member.description }}
-{{tab}}{%- if member.type.stereotypes.static %}static {% endif -%}
-{%- if member.type.stereotypes.const %}const {% endif -%}
-{%- if member.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if member.type.name %}{{ member.type.name }} {% endif -%}
-{%- if member.type.stereotypes.pointer %}*{% endif -%}
-{%- if member.type.stereotypes.lval_reference %}&{% endif -%}
-{{ member.name }};
+{{tab}}{%- if member.const %}const {% endif -%}
+{%- if member.volatile %}volatile {% endif -%}
+{{ member.type }}{{ member.indirection }} {{ member.name }}{ {{ member.default }} };
 {%- endmacro %}
 
 
@@ -25,24 +21,18 @@
 {% for p in method.params %}
 {{tab}}/// @param {{ p.name }} {{ p.description }}
 {% endfor %}
-{{tab}}{%- if method.type.stereotypes.static %}static {% endif -%}
-{%- if method.type.stereotypes.const %}const {% endif -%}
-{%- if method.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if method.type.name %}{{ method.type.name }} {% endif -%}
-{{ method.name }}(
+{{tab}}{%- if method.const %}const {% endif -%}
+{%- if method.volatile %}volatile {% endif -%}
+{{ method.type }}{{ method.indirection }} {{ method.name }}(
 {%- for p in method.params -%}
-{%- if p.type.stereotypes.const %}const {% endif -%}
-{%- if p.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if p.type.name %}{{ p.type.name }} {% endif -%}
-{%- if p.type.stereotypes.pointer %}*{% endif -%}
-{%- if p.type.stereotypes.lval_reference %}&{% endif -%}
-{%- if p.type.stereotypes.rval_reference %}&&{% endif -%}
-{{ p.name }}{% if not loop.last %}, {% endif %}
+{%- if p.const %}const {% endif -%}
+{%- if p.volatile %}volatile {% endif -%}
+{{ p.type }}{{ p.indirection }} {{ p.name }}{% if not loop.last %}, {% endif %}
 {%- endfor -%}
 )
-{%- if method.type.stereotypes.immutable %} const{% endif -%}
-{%- if method.type.stereotypes.noexcept %} noexcept{% endif -%}
-{%- if method.type.stereotypes.override %} override{% endif %};
+{%- if method.immutable %} const{% endif -%}
+{%- if method.noexcept %} noexcept{% endif -%}
+{%- if method.override %} override{% endif %};
 {%- endmacro %}
 
 
@@ -52,22 +42,17 @@
 {% for p in method.params %}
 /// @param {{ p.name }} {{ p.description }}
 {% endfor %}
-{%- if method.type.stereotypes.const %}const {% endif -%}
-{%- if method.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if method.type.name %}{{ method.type.name }} {% endif -%}
-{{ modelname }}::{{ method.name }}(
+{%- if method.const %}const {% endif -%}
+{%- if method.volatile %}volatile {% endif -%}
+{{ method.type }}{{ method.indirection }} {{ modelname }}::{{ method.name }}(
 {%- for p in method.params -%}
-{%- if p.type.stereotypes.const %}const {% endif -%}
-{%- if p.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if p.type.name %}{{ p.type.name }} {% endif -%}
-{%- if p.type.stereotypes.pointer %}*{% endif -%}
-{%- if p.type.stereotypes.lval_reference %}&{% endif -%}
-{%- if p.type.stereotypes.rval_reference %}&&{% endif -%}
-{{ p.name }}{% if not loop.last %}, {% endif %}
+{%- if p.const %}const {% endif -%}
+{%- if p.volatile %}volatile {% endif -%}
+{{ p.type }}{{ p.indirection }} {{ p.name }}{% if not loop.last %}, {% endif %}
 {%- endfor -%}
 )
-{%- if method.type.stereotypes.immutable %} const{% endif -%}
-{%- if method.type.stereotypes.noexcept %} noexcept{% endif %}
+{%- if method.immutable %} const{% endif -%}
+{%- if method.noexcept %} noexcept{% endif %}
 
 {
 {{tab}}// TODO: implement
@@ -83,16 +68,12 @@
 {% endfor %}
 {{tab}}{{ modelname }}(
 {%- for p in constructor.params -%}
-{%- if p.type.stereotypes.const %}const {% endif -%}
-{%- if p.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if p.type.name %}{{ p.type.name }} {% endif -%}
-{%- if p.type.stereotypes.pointer %}*{% endif -%}
-{%- if p.type.stereotypes.lval_reference %}&{% endif -%}
-{%- if p.type.stereotypes.rval_reference %}&&{% endif -%}
-{{ p.name }}{% if not loop.last %}, {% endif %}
+{%- if p.const %}const {% endif -%}
+{%- if p.volatile %}volatile {% endif -%}
+{{ p.type }}{{ p.indirection }} {{ p.name }}{% if not loop.last %}, {% endif %}
 {%- endfor -%}
 )
-{%- if constructor.type.stereotypes.noexcept %} noexcept{% endif -%};
+{%- if constructor.noexcept %} noexcept{% endif -%};
 {%- endmacro %}
 
 
@@ -104,16 +85,12 @@
 {% endfor %}
 {{ modelname }}::{{ modelname }}(
 {%- for p in constructor.params -%}
-{%- if p.type.stereotypes.const %}const {% endif -%}
-{%- if p.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if p.type.name %}{{ p.type.name }} {% endif -%}
-{%- if p.type.stereotypes.pointer %}*{% endif -%}
-{%- if p.type.stereotypes.lval_reference %}&{% endif -%}
-{%- if p.type.stereotypes.rval_reference %}&&{% endif -%}
-{{ p.name }}{% if not loop.last %}, {% endif %}
+{%- if p.const %}const {% endif -%}
+{%- if p.volatile %}volatile {% endif -%}
+{{ p.type }}{{ p.indirection }} {{ p.name }}{% if not loop.last %}, {% endif %}
 {%- endfor -%}
 )
-{%- if constructor.type.stereotypes.noexcept %} noexcept{% endif %}
+{%- if constructor.noexcept %} noexcept{% endif %}
 
 {
 {{tab}}// TODO: implement
@@ -145,22 +122,17 @@
 {{tab}}/// @param {{ p.name }} {{ p.description }}
 {% endfor %}
 {{tab}}{%- if true %}virtual {% endif -%}
-{%- if method.type.stereotypes.const %}const {% endif -%}
-{%- if method.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if method.type.name %}{{ method.type.name }} {% endif -%}
-{{ method.name }}(
+{%- if method.const %}const {% endif -%}
+{%- if method.volatile %}volatile {% endif -%}
+{{ method.type }}{{ method.indirection }} {{ method.name }}(
 {%- for p in method.params -%}
-{%- if p.type.stereotypes.const %}const {% endif -%}
-{%- if p.type.stereotypes.volatile %}volatile {% endif -%}
-{%- if p.type.name %}{{ p.type.name }} {% endif -%}
-{%- if p.type.stereotypes.pointer %}*{% endif -%}
-{%- if p.type.stereotypes.lval_reference %}&{% endif -%}
-{%- if p.type.stereotypes.rval_reference %}&&{% endif -%}
-{{ p.name }}{% if not loop.last %}, {% endif %}
+{%- if p.const %}const {% endif -%}
+{%- if p.volatile %}volatile {% endif -%}
+{{ p.type }}{{ p.indirection }} {{ p.name }}{% if not loop.last %}, {% endif %}
 {%- endfor -%}
 )
-{%- if method.type.stereotypes.immutable %} const{% endif -%}
-{%- if method.type.stereotypes.noexcept %} noexcept{% endif %} = 0;
+{%- if method.immutable %} const{% endif -%}
+{%- if method.noexcept %} noexcept{% endif %} = 0;
 {%- endmacro %}
 
 

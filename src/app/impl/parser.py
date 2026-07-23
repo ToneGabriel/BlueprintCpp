@@ -1,4 +1,4 @@
-from app.impl.model import Stereotype, Visibility, ParameterType, Inheritance, Parameter, Method, EnumValue, Model
+from app.impl.model import Visibility, Inheritance, Parameter, Method, EnumValue, Model
 import yaml
 from typing import Any
 
@@ -15,9 +15,6 @@ class Parser:
         self._project_include_map[typename] = include
 
     def parse_yaml(self, model: Model, yaml_text: str) -> None:
-        if not model:
-            return
-
         data = yaml.safe_load(yaml_text) or {}
 
         self._parse_description(model, data.get("description", "Model description"))
@@ -34,48 +31,51 @@ class Parser:
         for i in inheritances:
             inheritance = Inheritance(i.get("type", "void"), Visibility(i.get("visibility", "public")), i.get("virtual", False))
             model.add_inheritance(inheritance)
-            self._check_includes(model, i.get("type", "void"))
+            self._add_includes(model, i.get("type", "void"))
 
     def _parse_members(self, model: Model, members_data: list[dict[str, Any]]) -> None:
         for m in members_data:
             visibility = Visibility(m.get("visibility", "private"))
-            member = Parameter(m.get("name", "_defaultMember"), m.get("description", "Member description"))
+            member = Parameter(m.get("name", "_defaultMember"),
+                               m.get("description", "Member description"),
+                               m.get("type", "void"),
+                               m.get("indirection", ""),
+                               m.get("const", False),
+                               m.get("volatile", False),
+                               m.get("default", ""),
+                               )
 
-            # type
-            mtype_data = m.get("type", {})
-            mtype = ParameterType(mtype_data.get("name", "void"))
-            for st in mtype_data.get("stereotypes", []):
-                mtype.add_stereotype(Stereotype(st))
-            member.set_type(mtype)
-            self._check_includes(model, mtype_data.get("name", "void"))
-
+            self._add_includes(model, m.get("type", "void"))
             model.add_member(visibility, member)
 
     def _parse_methods(self, model: Model, methods_data: list[dict[str, Any]]) -> None:
         for m in methods_data:
             visibility = Visibility(m.get("visibility", "public"))
-            method = Method(m.get("name", "_DefaultMethod"), m.get("description", "Method description"))
+            method = Method(m.get("name", "_DefaultMethod"),
+                            m.get("description", "Method description"),
+                            m.get("type", "void"),
+                            m.get("indirection", ""),
+                            m.get("const", False),
+                            m.get("volatile", False),
+                            m.get("immutable", False),
+                            m.get("noexcept", False),
+                            m.get("override", False)
+                            )
 
-            # return type
-            mret_type_data = m.get("type", {})
-            mret_type = ParameterType(mret_type_data.get("name", "void"))
-            for st in mret_type_data.get("stereotypes", []):
-                mret_type.add_stereotype(Stereotype(st))
-            method.set_type(mret_type)
-            self._check_includes(model, mret_type_data.get("name", "void"))
+            self._add_includes(model, m.get("type", "void"))
 
             # parameters
             for p in m.get("params", []):
-                param = Parameter(p.get("name", "_defaultParam"), p.get("description", "Parameter description"))
+                param = Parameter(p.get("name", "_defaultParam"),
+                                  p.get("description", "Parameter description"),
+                                  p.get("type", "void"),
+                                  p.get("indirection", ""),
+                                  p.get("const", False),
+                                  p.get("volatile", False),
+                                  p.get("default", ""),
+                                  )
 
-                # type
-                ptype_data = p.get("type", {})
-                ptype = ParameterType(ptype_data.get("name", "void"))
-                for st in ptype_data.get("stereotypes", []):
-                    ptype.add_stereotype(Stereotype(st))
-                param.set_type(ptype)
-                self._check_includes(model, ptype_data.get("name", "void"))
-
+                self._add_includes(model, p.get("type", "void"))
                 method.add_parameter(param)
 
             model.add_method(visibility, method)
@@ -84,25 +84,18 @@ class Parser:
         for c in constructors_data:
             method = Method("Ignored", c.get("description", "Constructor description"))
 
-            # return type
-            mret_type_data = c.get("type", {})
-            mret_type = ParameterType(mret_type_data.get("name", ""))
-            for st in mret_type_data.get("stereotypes", []):
-                mret_type.add_stereotype(Stereotype(st))
-            method.set_type(mret_type)
-
             # parameters
             for p in c.get("params", []):
-                param = Parameter(p.get("name", "_defaultParam"), p.get("description", "Parameter description"))
+                param = Parameter(p.get("name", "_defaultParam"),
+                                  p.get("description", "Parameter description"),
+                                  p.get("type", "void"),
+                                  p.get("indirection", ""),
+                                  p.get("const", False),
+                                  p.get("volatile", False),
+                                  p.get("default", ""),
+                                  )
 
-                # type
-                ptype_data = p.get("type", {})
-                ptype = ParameterType(ptype_data.get("name", "void"))
-                for st in ptype_data.get("stereotypes", []):
-                    ptype.add_stereotype(Stereotype(st))
-                param.set_type(ptype)
-                self._check_includes(model, ptype_data.get("name", "void"))
-
+                self._add_includes(model, p.get("type", "void"))
                 method.add_parameter(param)
 
             model.add_constructor(method)
@@ -113,7 +106,7 @@ class Parser:
 
             model.add_enum_value(evalue)
 
-    def _check_includes(self, model: Model, typedef: str) -> None:
+    def _add_includes(self, model: Model, typedef: str) -> None:
         std_types: list[str] = self._extract_std_types(typedef)
 
         for t in std_types:
