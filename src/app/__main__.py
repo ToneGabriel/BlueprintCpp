@@ -41,7 +41,8 @@ def main() -> None:
         config.CLASS_HEADER_TEMPLATE_FILENAME,
         config.CLASS_SOURCE_TEMPLATE_FILENAME,
         config.INTERFACE_HEADER_TEMPLATE_FILENAME,
-        config.ENUM_HEADER_TEMPLATE_FILENAME
+        config.ENUM_HEADER_TEMPLATE_FILENAME,
+        config.TAB_INDENT
     )
 
     # Create Parser
@@ -84,8 +85,7 @@ def main() -> None:
         source_file: Path = destination_dir / f"{model_info.name}.cpp"
 
         # Parse yaml and append info to model
-        PARSER.set_model(model)
-        PARSER.parse_yaml(yaml_path.read_text())
+        PARSER.parse_yaml(model, yaml_path.read_text())
 
         match model_info.classification:
             case impl.ModelClassification.CLASS:

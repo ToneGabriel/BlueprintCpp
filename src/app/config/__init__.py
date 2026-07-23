@@ -1,12 +1,15 @@
 
+GENERATOR_APP_NAME: str = "BlueprintCPP"
+
 JINJA_ENV_PACKAGE: str                  = "app.jinja"
 CLASS_HEADER_TEMPLATE_FILENAME: str     = "class.h.j2"
 CLASS_SOURCE_TEMPLATE_FILENAME: str     = "class.cpp.j2"
 INTERFACE_HEADER_TEMPLATE_FILENAME: str = "interface.h.j2"
 ENUM_HEADER_TEMPLATE_FILENAME: str      = "enum.h.j2"
+TAB_INDENT: str                         = "    "
 
 
-STANDARD_INCLUDE_MAP = {
+STANDARD_INCLUDE_MAP: dict[str, str] = {
     # Containers
     "std::array":               "array",
     "std::deque":               "deque",

@@ -16,7 +16,7 @@ methods:
   # ------------------------
   - name: SetName
     description: Method description
-    visibility: protected
+    visibility: public
     type:
       name: void
       stereotypes: [const, immutable, noexcept, override]

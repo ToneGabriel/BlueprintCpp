@@ -10,32 +10,33 @@ class Parser:
 
         self._standard_include_map: dict[str, str]  = standard_include_map
         self._project_include_map: dict[str, str]   = {}
-        self._model: Model                          = None
-
-    def set_model(self, model: Model) -> None:
-        self._model = model
 
     def add_project_include(self, typename: str, include: str) -> None:
         self._project_include_map[typename] = include
 
-    def parse_yaml(self, yaml_text: str) -> None:
+    def parse_yaml(self, model: Model, yaml_text: str) -> None:
+        if not model:
+            return
+
         data = yaml.safe_load(yaml_text) or {}
 
-        self._model.set_description(data.get("description", "Model description"))
+        self._parse_description(model, data.get("description", "Model description"))
+        self._parse_inheritances(model, data.get("inherits", []))
+        self._parse_members(model, data.get("members", []))
+        self._parse_methods(model, data.get("methods", []))
+        self._parse_constructors(model, data.get("constructors", []))
+        self._parse_evalues(model, data.get("evalues", []))
 
-        self._parse_inheritances(data.get("inherits", []))
-        self._parse_members(data.get("members", []))
-        self._parse_methods(data.get("methods", []))
-        self._parse_constructors(data.get("constructors", []))
-        self._parse_evalues(data.get("evalues", []))
+    def _parse_description(self, model: Model, description: str) -> None:
+        model.set_description(description)
 
-    def _parse_inheritances(self, inheritances: list[dict[str, Any]]) -> None:
+    def _parse_inheritances(self, model: Model, inheritances: list[dict[str, Any]]) -> None:
         for i in inheritances:
             inheritance = Inheritance(i.get("type", "void"), Visibility(i.get("visibility", "public")), i.get("virtual", False))
-            self._model.add_inheritance(inheritance)
-            self._check_includes(i.get("type", "void"))
+            model.add_inheritance(inheritance)
+            self._check_includes(model, i.get("type", "void"))
 
-    def _parse_members(self, members_data: list[dict[str, Any]]) -> None:
+    def _parse_members(self, model: Model, members_data: list[dict[str, Any]]) -> None:
         for m in members_data:
             visibility = Visibility(m.get("visibility", "private"))
             member = Parameter(m.get("name", "_defaultMember"), m.get("description", "Member description"))
@@ -46,11 +47,11 @@ class Parser:
             for st in mtype_data.get("stereotypes", []):
                 mtype.add_stereotype(Stereotype(st))
             member.set_type(mtype)
-            self._check_includes(mtype_data.get("name", "void"))
+            self._check_includes(model, mtype_data.get("name", "void"))
 
-            self._model.add_member(visibility, member)
+            model.add_member(visibility, member)
 
-    def _parse_methods(self, methods_data: list[dict[str, Any]]) -> None:
+    def _parse_methods(self, model: Model, methods_data: list[dict[str, Any]]) -> None:
         for m in methods_data:
             visibility = Visibility(m.get("visibility", "public"))
             method = Method(m.get("name", "_DefaultMethod"), m.get("description", "Method description"))
@@ -61,7 +62,7 @@ class Parser:
             for st in mret_type_data.get("stereotypes", []):
                 mret_type.add_stereotype(Stereotype(st))
             method.set_type(mret_type)
-            self._check_includes(mret_type_data.get("name", "void"))
+            self._check_includes(model, mret_type_data.get("name", "void"))
 
             # parameters
             for p in m.get("params", []):
@@ -73,13 +74,13 @@ class Parser:
                 for st in ptype_data.get("stereotypes", []):
                     ptype.add_stereotype(Stereotype(st))
                 param.set_type(ptype)
-                self._check_includes(ptype_data.get("name", "void"))
+                self._check_includes(model, ptype_data.get("name", "void"))
 
                 method.add_parameter(param)
 
-            self._model.add_method(visibility, method)
+            model.add_method(visibility, method)
 
-    def _parse_constructors(self, constructors_data: list[dict[str, Any]]) -> None:
+    def _parse_constructors(self, model: Model, constructors_data: list[dict[str, Any]]) -> None:
         for c in constructors_data:
             method = Method("Ignored", c.get("description", "Constructor description"))
 
@@ -100,27 +101,27 @@ class Parser:
                 for st in ptype_data.get("stereotypes", []):
                     ptype.add_stereotype(Stereotype(st))
                 param.set_type(ptype)
-                self._check_includes(ptype_data.get("name", "void"))
+                self._check_includes(model, ptype_data.get("name", "void"))
 
                 method.add_parameter(param)
 
-            self._model.add_constructor(method)
+            model.add_constructor(method)
 
-    def _parse_evalues(self, evalues_data: list[dict[str, Any]]) -> None:
+    def _parse_evalues(self, model: Model, evalues_data: list[dict[str, Any]]) -> None:
         for e in evalues_data:
             evalue = EnumValue(e.get("name", "void"), e.get("value", ""))
 
-            self._model.add_enum_value(evalue)
+            model.add_enum_value(evalue)
 
-    def _check_includes(self, typedef: str) -> None:
+    def _check_includes(self, model: Model, typedef: str) -> None:
         std_types: list[str] = self._extract_std_types(typedef)
 
         for t in std_types:
             if (t in self._standard_include_map):
-                self._model.add_system_include_h(self._standard_include_map[t])
+                model.add_system_include_h(self._standard_include_map[t])
 
         if (typedef in self._project_include_map):
-            self._model.add_project_include_h(self._project_include_map[typedef])
+            model.add_project_include_h(self._project_include_map[typedef])
     
     def _extract_std_types(self, typedef: str) -> list[str]:
         results = []
