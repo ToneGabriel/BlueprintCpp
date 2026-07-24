@@ -10,7 +10,7 @@ inherits:
     visibility: public
     virtual: false
   # ------------------------
-  - type: interfaces::IModule
+  - type: project::interfaces::IModule
     visibility: public
     virtual: true
 

@@ -1,6 +1,5 @@
 
-GENERATOR_APP_NAME: str = "BlueprintCPP"
-
+GENERATOR_NAME_AND_VERSION: str         = "BlueprintCPP v2.0.0"
 JINJA_ENV_PACKAGE: str                  = "app.jinja"
 CLASS_HEADER_TEMPLATE_FILENAME: str     = "class.h.j2"
 CLASS_SOURCE_TEMPLATE_FILENAME: str     = "class.cpp.j2"

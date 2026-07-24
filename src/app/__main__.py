@@ -37,6 +37,7 @@ def main() -> None:
 
     # Create generator
     GENERATOR = impl.CppGenerator(
+        config.GENERATOR_NAME_AND_VERSION,
         config.JINJA_ENV_PACKAGE,
         config.CLASS_HEADER_TEMPLATE_FILENAME,
         config.CLASS_SOURCE_TEMPLATE_FILENAME,
@@ -90,13 +91,13 @@ def main() -> None:
         match model_info.classification:
             case impl.ModelClassification.CLASS:
                 # Generate text for header and cpp
-                header_content: str = GENERATOR.generate_class_header_content(model)
-                source_content: str = GENERATOR.generate_class_source_content(model)
+                header_content: str = GENERATOR.generate_class_header_content(model, yaml_path, header_file.relative_to(output_path))
+                source_content: str = GENERATOR.generate_class_source_content(model, yaml_path, source_file.relative_to(output_path))
             case impl.ModelClassification.INTERFACE:
-                header_content: str = GENERATOR.generate_interface_header_content(model)
+                header_content: str = GENERATOR.generate_interface_header_content(model, yaml_path, header_file.relative_to(output_path))
                 source_content: str = None
             case impl.ModelClassification.ENUM:
-                header_content: str = GENERATOR.generate_enum_header_content(model)
+                header_content: str = GENERATOR.generate_enum_header_content(model, yaml_path, header_file.relative_to(output_path))
                 source_content: str = None
 
         # Backup if requested

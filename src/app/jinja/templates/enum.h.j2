@@ -1,29 +1,34 @@
 {% import "utils.j2" as utils %}
+{# ============================================================================= Comment block for file header #}
+{{ utils.generate_file_header(name_and_version, source, file, timestamp) }}
 
-{{ utils.generate_file_header("TODO", tab) }}
 
+{# ======================================================================================== Open include guard #}
 #ifndef {{ model.include_guard }}
 #define {{ model.include_guard }}
 
 
+{# =========================================================================================== Open namespaces #}
 {% for ns in model.namespaces %}
 namespace {{ ns }} {
 {% endfor %}
 
 
-{# Enum start #}
+{# ================================================================================================= Open enum #}
 /// @brief {{ model.description }}
 enum class {{ model.name }}
 {
 
+{# ================================================================================================ Close enum #}
 }; // enum class {{ model.name }}
-{# Class end #}
 
 
+{# ========================================================================================== Close namespaces #}
 {% for ns in model.namespaces | reverse %}
 } // namespace {{ ns }}
 {% endfor %}
 
 
+{# ======================================================================================= Close include guard #}
 #endif // {{ model.include_guard }}
 

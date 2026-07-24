@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT_ROOT_DIR="$(pwd)"
-TEST_DIR="$PROJECT_ROOT_DIR/tests/blueprint/project"
+TEST_DIR="$PROJECT_ROOT_DIR/tests/blueprint"
 
 BUILD_DIR="$PROJECT_ROOT_DIR/.pyinstaller.out"
 DIST_DIR="$BUILD_DIR/dist"

@@ -1,14 +1,16 @@
 {% import "utils.j2" as utils %}
+{# ============================================================================= Comment block for file header #}
+{{ utils.generate_file_header(name_and_version, source, file, timestamp) }}
 
-{{ utils.generate_file_header("TODO", tab) }}
 
+{# ======================================================================================== Open include guard #}
 #ifndef {{ model.include_guard }}
 #define {{ model.include_guard }}
 
 
-// ----------------------------------------------------------------------------------------------------
-// -------------------------------------------- Includes ----------------------------------------------
-// ----------------------------------------------------------------------------------------------------
+{# ================================================================================ Comment block for Includes #}
+{{ utils.generate_comment_block(title="Includes") }}
+{# ============================================================================================== Add Includes #}
 {% for inc in model.includes_h.system %}
 #include <{{ inc }}>
 {% endfor %}
@@ -17,12 +19,13 @@
 {% endfor %}
 
 
+{# =========================================================================================== Open namespaces #}
 {% for ns in model.namespaces %}
 namespace {{ ns }} {
 {% endfor %}
 
 
-{# Class start #}
+{# ================================================================================================ Open class #}
 /// @brief {{ model.description }}
 class {{ model.name }}{% if model.inherits %} :
 {% for b in model.inherits %}
@@ -36,32 +39,34 @@ class {{ model.name }}{% if model.inherits %} :
 {
 {% endif %}
 
-// ----------------------------------------------------------------------------------------------------
-// ------------------------------------- Constructors/Destructor --------------------------------------
-// ----------------------------------------------------------------------------------------------------
+{# ================================================================= Comment block for Constructors/Destructor #}
+{{ utils.generate_comment_block(title="Constructors/Destructor") }}
+{# =============================================================================== Add Constructors/Destructor #}
 public:
 
 {{ utils.generate_interface_constructor_h(model.name, tab) }}
 
 {{ utils.generate_interface_destructor_h(model.name, tab) }}
 
-// ----------------------------------------------------------------------------------------------------
-// ------------------------------------------- Properties ---------------------------------------------
-// ----------------------------------------------------------------------------------------------------
+{# ============================================================================== Comment block for Properties #}
+{{ utils.generate_comment_block(title="Properties") }}
+{# ============================================================================================ Add Properties #}
 public:
 {% for m in model.methods.public %}
 
 {{ utils.generate_interface_method_h(m, tab) }}
 {% endfor %}
 
+{# =============================================================================================== Close class #}
 }; // class {{ model.name }}
-{# Class end #}
 
 
+{# ========================================================================================== Close namespaces #}
 {% for ns in model.namespaces | reverse %}
 } // namespace {{ ns }}
 {% endfor %}
 
 
+{# ======================================================================================= Close include guard #}
 #endif // {{ model.include_guard }}
 
