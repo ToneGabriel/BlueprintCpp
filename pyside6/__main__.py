@@ -7,7 +7,8 @@ from PySide6.QtWidgets import (
     QTextEdit,
     QSplitter,
     QWidget,
-    QHBoxLayout
+    QHBoxLayout,
+    QStackedWidget
 )
 
 from PySide6.QtGui import (
@@ -20,11 +21,22 @@ class GUIApplication:
     def __init__(self):
         # Application
         self._app: QApplication = None
+
+        # Main window
         self._window: QMainWindow = None
+
+        # Stack that holds all pages
+        # self._stack: QStackedWidget = None
+
+        # Page to start a project from
+        self._project_manager_page: QWidget = None
+
+        # Page to edit the project after it's selected
+        self._project_editor_page: QWidget = None
 
         # Data
         self._tree_model: QStandardItemModel = None
-        self._tree_project_holder: QStandardItem = None
+        self._tree_project_node: QStandardItem = None
 
         # Widgets
         self._tree: QTreeView = None
@@ -56,10 +68,22 @@ class GUIApplication:
         self._tree.setHeaderHidden(True)
         self._tree.setModel(self._tree_model)
 
-        self._tree_project_holder = QStandardItem(project_name)
-        self._tree_project_holder.setEditable(False)
+        self._tree_project_node = QStandardItem(project_name)
+        self._tree_project_node.setEditable(False)
 
-        self._tree_model.invisibleRootItem().appendRow(self._tree_project_holder)
+        # sub1 = QStandardItem("Sub1")
+        # sub2 = QStandardItem("Sub2")
+        # class1 = QStandardItem("Class1")
+        # class2 = QStandardItem("Class2")
+        # class3 = QStandardItem("Class3")
+
+        # self._tree_project_node.appendRow(sub1)
+        # self._tree_project_node.appendRow(sub2)
+        # sub1.appendRow(class1)
+        # sub1.appendRow(class2)
+        # sub2.appendRow(class3)
+
+        self._tree_model.invisibleRootItem().appendRow(self._tree_project_node)
 
     def _init_editor(self):
         self._editor = QTextEdit()
@@ -90,6 +114,7 @@ class GUIApplication:
         self._horizontal_splitter.setSizes([800, 300])
 
         self._window.setCentralWidget(self._horizontal_splitter)
+        self._window.setWindowTitle("Blueprint::Cpp")
         self._window.resize(1200, 800)
 
     def set_busy(self, busy: bool):
@@ -103,60 +128,27 @@ class GUIApplication:
         self._app.exec()
 
 
+# class GUITree:
+#     def __init__(self, name: str):
+#         self._tree = QTreeView()
+#         self._tree_model = QStandardItemModel()
+#         self._tree_project_node = QStandardItem(name)
+
+#         self._tree.setHeaderHidden(True)
+#         self._tree.setModel(self._tree_model)
+#         self._tree_model.invisibleRootItem().appendRow(self._tree_project_node)
+#         self._tree_project_node.setEditable(False)
+
+#     def add_node(self, name: str, parent: QStandardItem) -> None:
+#         node = QStandardItem(name)
+#         parent.appendRow(node)
+
+
 def main():
     app = GUIApplication()
     app.start()
 
-    # app = QApplication([])
-    # window = QMainWindow()
-
-    # # Left widget
-    # tree = QTreeView()
-    # model = QStandardItemModel()
-    # root = model.invisibleRootItem()
-
-    # # model.setHorizontalHeaderLabels(["Project"])
-    # tree.setHeaderHidden(True)
-    # tree.setModel(model)
-
-    # project = QStandardItem("Project")
-    # sub1 = QStandardItem("Sub1")
-    # sub2 = QStandardItem("Sub2")
-    # class1 = QStandardItem("Class1")
-    # class2 = QStandardItem("Class2")
-    # class3 = QStandardItem("Class3")
-
-    # root.appendRow(project)
-    # tree.expand(project.index())
-    # project.setEditable(False)
-
-    # project.appendRow(sub1)
-    # project.appendRow(sub2)
-    # sub1.appendRow(class1)
-    # sub1.appendRow(class2)
-    # sub2.appendRow(class3)
-
-    # # Right widget (placeholder)
-    # editor = QTextEdit()
-
-    # # Splitter
-    # vsplitter = QSplitter(Qt.Horizontal)
-    # vsplitter.addWidget(tree)
-    # vsplitter.addWidget(editor)
-
-    # # 1/3 : 2/3
-    # vsplitter.setSizes([400, 800])
-
-    # window.setCentralWidget(vsplitter)
-
-    # font = QFont()
-    # font.setPointSize(14)
-    # app.setFont(font)
-
-    # window.resize(1200, 800)
-    # window.showMaximized()
-    # app.exec()
-
 
 if __name__ == "__main__":
     main()
+
