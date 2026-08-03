@@ -1,21 +1,10 @@
-from PySide6.QtCore import Qt
-
-from PySide6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QTreeView,
-    QTextEdit,
-    QSplitter,
-    QWidget,
-    QHBoxLayout,
-    QStackedWidget
+from pyside6.modules import (
+    Application,
+    Tree,
+    Editor,
+    Logger
 )
 
-from PySide6.QtGui import (
-    QStandardItemModel,
-    QStandardItem,
-    QFont,
-)
 
 class GUIApplication:
     def __init__(self):
@@ -117,36 +106,12 @@ class GUIApplication:
         self._window.setWindowTitle("Blueprint::Cpp")
         self._window.resize(1200, 800)
 
-    def set_busy(self, busy: bool):
-        self._work_area.setEnabled(not busy)
-
-    def log(self, message: str):
-        self._logger.append(message)
-
-    def start(self):
-        self._window.showMaximized()
-        self._app.exec()
-
-
-# class GUITree:
-#     def __init__(self, name: str):
-#         self._tree = QTreeView()
-#         self._tree_model = QStandardItemModel()
-#         self._tree_project_node = QStandardItem(name)
-
-#         self._tree.setHeaderHidden(True)
-#         self._tree.setModel(self._tree_model)
-#         self._tree_model.invisibleRootItem().appendRow(self._tree_project_node)
-#         self._tree_project_node.setEditable(False)
-
-#     def add_node(self, name: str, parent: QStandardItem) -> None:
-#         node = QStandardItem(name)
-#         parent.appendRow(node)
-
 
 def main():
-    app = GUIApplication()
-    app.start()
+    app = Application()
+    tree = Tree()
+    editor = Editor()
+    logger = Logger()
 
 
 if __name__ == "__main__":

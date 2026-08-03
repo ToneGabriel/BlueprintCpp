@@ -16,8 +16,7 @@ TEMPLATES_PACKAGE_DIR="app/jinja/templates"
 RELEASE_ZIP_NAME="blueprintcpp-linux-x86_64.zip"
 EXECUTABLE="$RELEASE_DIR/$RELEASE_NAME"
 
-# Build project only if it doesn't already exist
-if [ ! -f "$EXECUTABLE" ]; then
+build() {
     echo "Building $RELEASE_NAME..."
 
     pyinstaller --onedir --noconfirm                                \
@@ -27,6 +26,13 @@ if [ ! -f "$EXECUTABLE" ]; then
                 --workpath "$WORK_DIR"                              \
                 --specpath "$BUILD_DIR"                             \
                 "$MAIN_FILE"
+}
+
+archive() {
+    if [ ! -d "$RELEASE_DIR" ]; then
+        echo "Release directory not found. Build first."
+        exit 1
+    fi
 
     echo "Creating release archive..."
 
@@ -34,9 +40,37 @@ if [ ! -f "$EXECUTABLE" ]; then
         cd "$DIST_DIR" || exit 1
         zip -r -X "$RELEASE_ZIP_NAME" "$RELEASE_NAME"
     )
-else
-    echo "Using existing build."
-fi
+}
 
-# Run program
-"$EXECUTABLE" "$TEST_DIR"
+run() {
+    if [ ! -f "$EXECUTABLE" ]; then
+        echo "Executable not found. Build first."
+        exit 1
+    fi
+
+    "$EXECUTABLE" "$TEST_DIR"
+}
+
+DO_BUILD=false
+DO_ARCHIVE=false
+DO_RUN=false
+
+while getopts "bar" opt; do
+    case "$opt" in
+        b) DO_BUILD=true ;;
+        a) DO_ARCHIVE=true ;;
+        r) DO_RUN=true ;;
+        ?)
+            echo "Usage: $0 [-b] [-a] [-r]"
+            echo "  -b    Build the application"
+            echo "  -a    Create the release archive"
+            echo "  -r    Run the built application"
+            exit 1
+            ;;
+    esac
+done
+
+# Execute in a fixed order
+$DO_BUILD && build
+$DO_ARCHIVE && archive
+$DO_RUN && run
