@@ -1,4 +1,4 @@
-import pyside6.interfaces as interfaces
+import app.ui.interfaces as interfaces
 
 from PySide6.QtCore import Qt
 

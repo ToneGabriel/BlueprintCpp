@@ -12,6 +12,29 @@
 
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
+    // Pass the WSLg display through to the container (equivalent of -e DISPLAY=$DISPLAY)
+    "containerEnv":
+    {
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
+        "XDG_RUNTIME_DIR": "${localEnv:XDG_RUNTIME_DIR}",
+        "QT_QPA_PLATFORM": "xcb"
+    },
+
+    // Mount the X11 socket and WSLg runtime dir for GUI passthrough
+    "mounts":
+    [
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+        "source=/mnt/wslg,target=/mnt/wslg,type=bind"
+    ],
+
+    // Optional: GPU passthrough via WSLg. Remove if you don't need
+    // OpenGL/GPU acceleration for Qt rendering.
+    "runArgs":
+    [
+        "--device=/dev/dxg"
+    ],
+
     "customizations":
     {
         "vscode":

@@ -1,8 +1,14 @@
 import app.impl as impl
 import app.config as config
+import app.ui.modules as uimodules
 
 import argparse
 from pathlib import Path
+
+import sys
+from PySide6.QtWidgets import QApplication, QLabel
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QColor, QPalette
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -113,5 +119,43 @@ def main() -> None:
             source_file.write_text(source_content)
 
 
+def main_ui() -> None:
+    app = uimodules.Application()
+    tree = uimodules.Tree()
+    editor = uimodules.Editor()
+    logger = uimodules.Logger()
+
+    app.set_tree_reference(tree)
+    app.set_editor_reference(editor)
+    app.set_logger_reference(logger)
+
+    tree.set_editor_reference(editor)
+
+    app.run()
+
+
+def main_test() -> None:
+    app = QApplication(sys.argv)
+
+    label = QLabel("IF YOU SEE THIS, IT WORKS")
+    label.setAlignment(Qt.AlignCenter)
+    label.setStyleSheet("background-color: red; color: white; font-size: 32px;")
+    label.resize(600, 400)
+    label.setWindowTitle("GUI TEST")
+
+    label.show()
+    label.raise_()
+    label.activateWindow()
+
+    print("Window should now be visible. Waiting 15 seconds before auto-closing...", flush=True)
+
+    # Auto-close after 15s so the test doesn't hang forever if run in CI/scripted contexts
+    QTimer.singleShot(15000, app.quit)
+
+    sys.exit(app.exec())
+
+
 if __name__ == "__main__":
-    main()
+    # main_test()
+    # main()
+    main_ui()

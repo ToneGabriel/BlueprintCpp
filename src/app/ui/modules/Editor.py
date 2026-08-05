@@ -1,4 +1,4 @@
-import pyside6.interfaces as interfaces
+import app.ui.interfaces as interfaces
 
 from PySide6.QtCore import Qt
 
@@ -22,7 +22,7 @@ from PySide6.QtGui import (
 
 class Editor(interfaces.IEditorModule):
     def __init__(self):
-        pass
+        self._q_text = QTextEdit()
 
     def get_root_widget(self) -> QWidget:
-        pass
+        return self._q_text
