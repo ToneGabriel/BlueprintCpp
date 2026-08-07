@@ -1,4 +1,4 @@
-import app.ui.interfaces as interfaces
+import app.ui.generated.ui_mainwindow as mainwindow
 
 from PySide6.QtCore import Qt
 
@@ -18,14 +18,10 @@ from PySide6.QtGui import (
 
 class Application:
     def __init__(self):
-        # external references
-        self._tree: interfaces.ITreeModule = None
-        self._editor: interfaces.IEditorModule = None
-        self._logger: interfaces.ILoggerModule = None
-
         # widgets
-        self._q_app = QApplication([])
         self._q_window = QMainWindow()
+
+        self._window_widgets = mainwindow.Ui_MainWindow()
 
         self._q_font = QFont()
 
@@ -45,45 +41,19 @@ class Application:
 
         self._q_window.setCentralWidget(self._q_horizontal_splitter)
 
-    def set_tree_reference(self, tree: interfaces.ITreeModule) -> None:
-        if self._tree is not None:
-            raise RuntimeError("Tree module already set")
-
-        self._tree = tree
-        self._q_vertical_splitter.addWidget(self._tree.get_root_widget())
-
-    def set_editor_reference(self, editor: interfaces.IEditorModule) -> None:
-        if self._editor is not None:
-            raise RuntimeError("Editor module already set")
-
-        self._editor = editor
-        self._q_vertical_splitter.addWidget(self._editor.get_root_widget())
-
-    def set_logger_reference(self, logger: interfaces.ILoggerModule) -> None:
-        if self._logger is not None:
-            raise RuntimeError("Logger module already set")
-
-        self._logger = logger
-        self._q_horizontal_splitter.addWidget(self._logger.get_root_widget())
-
     def run(self) -> None:
-        if self._tree is None:
-            raise RuntimeError("Tree module NOT set")
+        app = QApplication([])
 
-        if self._editor is None:
-            raise RuntimeError("Editor module NOT set")
-
-        if self._logger is None:
-            raise RuntimeError("Logger module NOT set")
+        self._main_window = QMainWindow()
+        self._window_widgets.setupUi(self._main_window)
 
         self._q_vertical_splitter.setSizes([400, 800])
         self._q_horizontal_splitter.setSizes([800, 300])
 
-        self._q_window.resize(1200, 800)
-        self._q_window.setWindowTitle("Blueprint::Cpp")
-        self._q_window.showMaximized()
+        self._main_window.resize(1200, 800)
+        self._main_window.showMaximized()
 
-        self._q_app.exec()
+        app.exec()
 
     def _set_busy(self, busy: bool):
         self._q_work_area.setEnabled(not busy)

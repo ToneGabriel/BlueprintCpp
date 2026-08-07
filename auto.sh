@@ -13,8 +13,17 @@ MAIN_FILE="$PROJECT_ROOT_DIR/src/app/__main__.py"
 TEMPLATES_DIR="$PROJECT_ROOT_DIR/src/app/jinja/templates"
 TEMPLATES_PACKAGE_DIR="app/jinja/templates"
 
+ARTIFACTS_UI_DIR="$PROJECT_ROOT_DIR/ui_artifacts"
+GENERATED_UI_DIR="$PROJECT_ROOT_DIR/src/app/ui/generated"
+
 RELEASE_ZIP_NAME="blueprintcpp-linux-x86_64.zip"
 EXECUTABLE="$RELEASE_DIR/$RELEASE_NAME"
+
+generate() {
+    echo "Generating UI tools..."
+
+    pyside6-uic ui_artifacts/mainwindow.ui -o src/app/ui/generated/ui_mainwindow.py
+}
 
 build() {
     echo "Building $RELEASE_NAME..."
@@ -51,17 +60,20 @@ run() {
     "$EXECUTABLE" "$TEST_DIR"
 }
 
+DO_GENERATE=false
 DO_BUILD=false
 DO_ARCHIVE=false
 DO_RUN=false
 
-while getopts "bar" opt; do
+while getopts "gbar" opt; do
     case "$opt" in
+        g) DO_GENERATE=true ;;
         b) DO_BUILD=true ;;
         a) DO_ARCHIVE=true ;;
         r) DO_RUN=true ;;
         ?)
-            echo "Usage: $0 [-b] [-a] [-r]"
+            echo "Usage: $0 [-g] [-b] [-a] [-r]"
+            echo "  -g    Generate UI tools for python"
             echo "  -b    Build the application"
             echo "  -a    Create the release archive"
             echo "  -r    Run the built application"
@@ -71,6 +83,7 @@ while getopts "bar" opt; do
 done
 
 # Execute in a fixed order
+$DO_GENERATE && generate
 $DO_BUILD && build
 $DO_ARCHIVE && archive
 $DO_RUN && run
