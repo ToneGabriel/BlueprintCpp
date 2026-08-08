@@ -126,23 +126,6 @@ def main_ui() -> None:
     app.run()
 
 
-def main_test() -> None:
-    app = QApplication()
-    window = QMainWindow()
-
-    mainwindow.Ui_MainWindow().setupUi(window)
-
-    window.setWindowFlags(
-        Qt.Window
-        | Qt.CustomizeWindowHint
-        | Qt.WindowTitleHint
-        | Qt.WindowCloseButtonHint)
-
-    window.showMaximized()
-    app.exec()
-
-
 if __name__ == "__main__":
     # main()
     main_ui()
-    # main_test()

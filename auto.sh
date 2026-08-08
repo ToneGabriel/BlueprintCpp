@@ -23,6 +23,7 @@ generate() {
     echo "Generating UI tools..."
 
     pyside6-uic ui_artifacts/mainwindow.ui -o src/app/ui/generated/ui_mainwindow.py
+    pyside6-uic ui_artifacts/newprojectdialog.ui -o src/app/ui/generated/ui_newprojectdialog.py
 }
 
 build() {
