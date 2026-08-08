@@ -67,13 +67,25 @@
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <widget class="QTreeWidget" name="projectTree">
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Sunken</enum>
+        </property>
         <column>
          <property name="text">
-          <string>Project</string>
+          <string>Project Tree</string>
          </property>
         </column>
        </widget>
        <widget class="QTableWidget" name="propertiesTable">
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Sunken</enum>
+        </property>
         <attribute name="horizontalHeaderStretchLastSection">
          <bool>true</bool>
         </attribute>
@@ -92,12 +104,12 @@
         </column>
        </widget>
       </widget>
-      <widget class="QTextEdit" name="logger">
+      <widget class="QTextEdit" name="loggTextWindow">
        <property name="frameShape">
-        <enum>QFrame::Shape::NoFrame</enum>
+        <enum>QFrame::Shape::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Shadow::Plain</enum>
+        <enum>QFrame::Shadow::Sunken</enum>
        </property>
       </widget>
      </widget>

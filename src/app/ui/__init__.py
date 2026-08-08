@@ -1,1 +1,1 @@
-from .modules.Application import Application
+from .Application import Application

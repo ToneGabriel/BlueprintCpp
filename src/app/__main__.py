@@ -1,6 +1,6 @@
 import app.impl as impl
 import app.config as config
-import app.ui.modules as uimodules
+import app.ui as ui
 import app.ui.generated.ui_mainwindow as mainwindow
 
 
@@ -122,7 +122,7 @@ def main() -> None:
 
 
 def main_ui() -> None:
-    app = uimodules.Application()
+    app = ui.Application()
     app.run()
 
 
@@ -132,11 +132,17 @@ def main_test() -> None:
 
     mainwindow.Ui_MainWindow().setupUi(window)
 
+    window.setWindowFlags(
+        Qt.Window
+        | Qt.CustomizeWindowHint
+        | Qt.WindowTitleHint
+        | Qt.WindowCloseButtonHint)
+
     window.showMaximized()
     app.exec()
 
 
 if __name__ == "__main__":
     # main()
-    # main_ui()
-    main_test()
+    main_ui()
+    # main_test()
