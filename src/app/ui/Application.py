@@ -5,7 +5,7 @@ from enum import Enum
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QDialog, QStyle)
+    QApplication, QMainWindow, QDialog, QStyle, QTreeWidgetItem)
 from PySide6.QtGui import (
     QFont, QKeySequence)
 
@@ -18,9 +18,6 @@ class ApplicationState(Enum):
 
 class Application:
     def __init__(self):
-        # state
-        self._state = ApplicationState.INIT
-
         # main widgets
         self._app = QApplication([])
         self._app_font = QFont()
@@ -40,21 +37,12 @@ class Application:
         self._init_menu_bar()
         self._init_logger()
 
-        self._set_init_state()
+        self._set_application_state(ApplicationState.INIT)
     # __init__
 
     def run(self) -> None:
-        # self._main_window.setWindowFlags(
-        #     Qt.Window |
-        #     Qt.CustomizeWindowHint |
-        #     Qt.WindowTitleHint |
-        #     Qt.WindowCloseButtonHint)
-
         self._main_window.resize(1200, 800)
         self._main_window.showMaximized()
-
-        self._new_project_dialog.exec()
-
         self._app.exec()
     # run
 
@@ -72,9 +60,13 @@ class Application:
     # _init_main_window
 
     def _init_menu_bar(self) -> None:
+        self._main_window_widgets.actionNew.triggered.connect(self._open_project_dialog)
+        self._main_window_widgets.actionNew.setShortcut(QKeySequence.New)
+        self._main_window_widgets.actionNew.setIcon(self._main_window.style().standardIcon(QStyle.SP_FileIcon))
+
         self._main_window_widgets.actionOpen.triggered.connect(self._open_project_dialog)
         self._main_window_widgets.actionOpen.setShortcut(QKeySequence.Open)
-        self._main_window_widgets.actionOpen.setIcon(self._main_window.style().standardIcon(QStyle.SP_FileIcon))
+        self._main_window_widgets.actionOpen.setIcon(self._main_window.style().standardIcon(QStyle.SP_DirIcon))
 
         self._main_window_widgets.actionSave.triggered.connect(self._save_project)
         self._main_window_widgets.actionSave.setShortcut(QKeySequence.Save)
@@ -102,47 +94,58 @@ class Application:
 
     def _open_project_dialog(self) -> None:
         self._new_project_dialog.exec()
+        self._open_new_project()    # TODO: remove from here
     # _open_project_dialog
+
+    def _open_new_project(self) -> None:
+        item = QTreeWidgetItem(["Project"])
+        item.setFlags(item.flags() | Qt.ItemIsEditable)
+        item.setIcon(0, self._main_window.style().standardIcon(QStyle.SP_DirIcon))
+        self._main_window_widgets.projectTree.addTopLevelItem(item)
+
+        self._set_application_state(ApplicationState.OPEN)
+    # _open_new_project
 
     def _save_project(self) -> None:
         pass
     # _save_project
 
     def _close_project(self) -> None:
-        pass
+        self._main_window_widgets.projectTree.clear()
+
+        self._main_window_widgets.propertiesTable.clearContents()
+        self._main_window_widgets.propertiesTable.setRowCount(0)
+
+        self._set_application_state(ApplicationState.INIT)
     # _close_project
 
     def _quit_application(self) -> None:
         self._app.quit()
     # _quit_application
 
-    def _set_init_state(self) -> None:
-        self._state = ApplicationState.INIT
+    def _set_application_state(self, state: ApplicationState) -> None:
+        match state:
+            case ApplicationState.INIT:
+                self._main_window_widgets.menubar.setEnabled(True)
+                self._main_window_widgets.horizontalSplitter.setEnabled(True)
 
-        self._main_window_widgets.menubar.setEnabled(True)
-        self._main_window_widgets.horizontalSplitter.setEnabled(True)
+                self._main_window_widgets.actionNew.setEnabled(True)
+                self._main_window_widgets.actionOpen.setEnabled(True)
+                self._main_window_widgets.actionSave.setEnabled(False)
+                self._main_window_widgets.actionClose.setEnabled(False)
+                self._main_window_widgets.actionGenerate.setEnabled(False)
 
-        self._main_window_widgets.actionOpen.setEnabled(True)
-        self._main_window_widgets.actionSave.setEnabled(False)
-        self._main_window_widgets.actionClose.setEnabled(False)
-        self._main_window_widgets.actionGenerate.setEnabled(False)
-    # _set_init_state
+            case ApplicationState.OPEN:
+                self._main_window_widgets.menubar.setEnabled(True)
+                self._main_window_widgets.horizontalSplitter.setEnabled(True)
 
-    def _set_open_state(self) -> None:
-        self._state = ApplicationState.OPEN
+                self._main_window_widgets.actionNew.setEnabled(False)
+                self._main_window_widgets.actionOpen.setEnabled(False)
+                self._main_window_widgets.actionSave.setEnabled(True)
+                self._main_window_widgets.actionClose.setEnabled(True)
+                self._main_window_widgets.actionGenerate.setEnabled(True)
 
-        self._main_window_widgets.menubar.setEnabled(True)
-        self._main_window_widgets.horizontalSplitter.setEnabled(True)
-
-        self._main_window_widgets.actionOpen.setEnabled(False)
-        self._main_window_widgets.actionSave.setEnabled(True)
-        self._main_window_widgets.actionClose.setEnabled(True)
-        self._main_window_widgets.actionGenerate.setEnabled(True)
-    # _set_open_state
-
-    def _set_busy_state(self) -> None:
-        self._state = ApplicationState.BUSY
-
-        self._main_window_widgets.menubar.setEnabled(False)
-        self._main_window_widgets.horizontalSplitter.setEnabled(False)
-    # _set_busy_state
+            case ApplicationState.BUSY:
+                self._main_window_widgets.menubar.setEnabled(False)
+                self._main_window_widgets.horizontalSplitter.setEnabled(False)
+    # _set_application_state

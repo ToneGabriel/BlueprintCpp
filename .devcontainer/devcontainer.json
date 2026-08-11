@@ -50,7 +50,8 @@
             {
                 "terminal.integrated.shell.linux": "/bin/bash",
                 "editor.formatOnSave": false,
-                "files.autoSave": "onFocusChange"
+                "files.autoSave": "onFocusChange",
+                "todo-tree.ripgrep": "/usr/bin/rg"
             }
         }
     }
