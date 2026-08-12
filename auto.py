@@ -105,13 +105,36 @@ def parse_arguments(argv=None) -> argparse.Namespace:
 
 def open_pyside6_designer() -> None:
     cmd = ["pyside6-designer"]
+    print("Opening Pyside6 Qt Widgets Designer")
     subprocess.run(cmd, check=True)
 # open_pyside6_designer
 
 
 def generate_ui_helper_modules() -> None:
-    # TODO - implement
-    pass
+    if not ARTIFACTS_UI_DIR.is_dir():
+        print(f"Error: UI artifacts directory not found: {ARTIFACTS_UI_DIR}", file=sys.stderr)
+        return
+
+    ui_files = sorted(ARTIFACTS_UI_DIR.glob("*.ui"))
+
+    if not ui_files:
+        print(f"No .ui files found in {ARTIFACTS_UI_DIR}")
+        return
+
+    GENERATED_UI_DIR.mkdir(parents=True, exist_ok=True)
+
+    for ui_file in ui_files:
+        output_file = GENERATED_UI_DIR / f"ui_{ui_file.stem}.py"
+
+        cmd = [
+            "pyside6-uic",
+            str(ui_file),
+            "-o",
+            str(output_file)
+        ]
+
+        print(f"Generating {output_file.relative_to(PROJECT_ROOT_DIR)} from {ui_file.relative_to(PROJECT_ROOT_DIR)}")
+        subprocess.run(cmd, check=True)
 # generate_ui_helper_modules
 
 
@@ -149,6 +172,7 @@ def run_app() -> None:
         str(TEST_DIR)
     ]
 
+    print(f"Running executable {EXECUTABLE.relative_to(PROJECT_ROOT_DIR)}")
     subprocess.run(cmd, check=True)
 # run_app
 

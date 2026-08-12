@@ -1,7 +1,10 @@
 import app.ui.generated.ui_mainwindow as mainwindow
 import app.ui.generated.ui_newprojectdialog as newprojectdialog
+import app.ui.generated.ui_closeprojectdialog as closeprojectdialog
+import app.ui.generated.ui_helpdialog as helpdialog
 
 from enum import Enum
+from datetime import datetime
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -23,6 +26,8 @@ class Application:
         self._app_font = QFont()
         self._main_window = QMainWindow()
         self._new_project_dialog = QDialog(self._main_window)
+        self._close_project_dialog = QDialog(self._main_window)
+        self._help_dialog = QDialog(self._main_window)
 
         # generated widgets
         self._main_window_widgets = mainwindow.Ui_MainWindow()
@@ -31,14 +36,20 @@ class Application:
         self._new_project_dialog_widgets = newprojectdialog.Ui_NewProjectDialog()
         self._new_project_dialog_widgets.setupUi(self._new_project_dialog)
 
+        self._close_project_dialog_widgets = closeprojectdialog.Ui_CloseProjectDialog()
+        self._close_project_dialog_widgets.setupUi(self._close_project_dialog)
+
+        self._help_dialog_widgets = helpdialog.Ui_HelpDialog()
+        self._help_dialog_widgets.setupUi(self._help_dialog)
+
         # initialization
         self._init_font()
         self._init_main_window()
         self._init_menu_bar()
-        self._init_logger()
 
         self._set_application_state(ApplicationState.INIT)
     # __init__
+
 
     def run(self) -> None:
         self._main_window.resize(1200, 800)
@@ -46,10 +57,12 @@ class Application:
         self._app.exec()
     # run
 
+
     def _init_font(self) -> None:
         self._app_font.setPointSize(14)
         self._app.setFont(self._app_font)
     # _init_font
+
 
     def _init_main_window(self) -> None:
         self._main_window_widgets.horizontalSplitter.setStretchFactor(0, 1) # tree
@@ -57,7 +70,10 @@ class Application:
 
         self._main_window_widgets.verticalSplitter.setStretchFactor(0, 3)   # horizontal splitter (tree + editor)
         self._main_window_widgets.verticalSplitter.setStretchFactor(1, 1)   # logger
+
+        self._main_window_widgets.loggTextWindow.setReadOnly(True)
     # _init_main_window
+
 
     def _init_menu_bar(self) -> None:
         self._main_window_widgets.actionNew.triggered.connect(self._open_project_dialog)
@@ -79,23 +95,20 @@ class Application:
         self._main_window_widgets.actionQuit.setShortcut(QKeySequence.Quit)
         self._main_window_widgets.actionQuit.setIcon(self._main_window.style().standardIcon(QStyle.SP_DialogCloseButton))
 
-        # self._main_window_widgets.actionGenerate.setShortcut(QKeySequence.)
+        # TODO: add trigger
         # self._main_window_widgets.actionGenerate.triggered.connect(self.)
         self._main_window_widgets.actionGenerate.setIcon(self._main_window.style().standardIcon(QStyle.SP_MediaPlay))
+
+        self._main_window_widgets.actionAbout.triggered.connect(self._open_help_dialog)
+        self._main_window_widgets.actionAbout.setIcon(self._main_window.style().standardIcon(QStyle.SP_TitleBarContextHelpButton))
     # _init_menu_bar
 
-    def _init_logger(self) -> None:
-        self._main_window_widgets.loggTextWindow.setReadOnly(True)
-    # _init_logger
-
-    def _log_message(self, message: str) -> None:
-        self._main_window_widgets.loggTextWindow.append(message)
-    # _log_message
 
     def _open_project_dialog(self) -> None:
         self._new_project_dialog.exec()
         self._open_new_project()    # TODO: remove from here
     # _open_project_dialog
+
 
     def _open_new_project(self) -> None:
         item = QTreeWidgetItem(["Project"])
@@ -106,46 +119,70 @@ class Application:
         self._set_application_state(ApplicationState.OPEN)
     # _open_new_project
 
+
     def _save_project(self) -> None:
-        pass
+        # TODO: implement
+        self._log_message("Project successfully saved!")
     # _save_project
 
+
     def _close_project(self) -> None:
-        self._main_window_widgets.projectTree.clear()
+        result = self._close_project_dialog.exec()
 
-        self._main_window_widgets.propertiesTable.clearContents()
-        self._main_window_widgets.propertiesTable.setRowCount(0)
+        if result == QDialog.Accepted:
+            self._main_window_widgets.projectTree.clear()
 
-        self._set_application_state(ApplicationState.INIT)
+            self._main_window_widgets.propertiesTable.clearContents()
+            self._main_window_widgets.propertiesTable.setRowCount(0)
+
+            self._set_application_state(ApplicationState.INIT)
+        else:
+            # just close the dialog
+            pass
     # _close_project
+
 
     def _quit_application(self) -> None:
         self._app.quit()
     # _quit_application
 
+
+    def _open_help_dialog(self) -> None:
+        self._help_dialog.exec()
+    # _open_help_dialog
+
+
     def _set_application_state(self, state: ApplicationState) -> None:
         match state:
             case ApplicationState.INIT:
                 self._main_window_widgets.menubar.setEnabled(True)
-                self._main_window_widgets.horizontalSplitter.setEnabled(True)
+                self._main_window_widgets.horizontalSplitter.setEnabled(True)   # tree + editor
 
                 self._main_window_widgets.actionNew.setEnabled(True)
                 self._main_window_widgets.actionOpen.setEnabled(True)
+
                 self._main_window_widgets.actionSave.setEnabled(False)
                 self._main_window_widgets.actionClose.setEnabled(False)
                 self._main_window_widgets.actionGenerate.setEnabled(False)
 
             case ApplicationState.OPEN:
                 self._main_window_widgets.menubar.setEnabled(True)
-                self._main_window_widgets.horizontalSplitter.setEnabled(True)
+                self._main_window_widgets.horizontalSplitter.setEnabled(True)   # tree + editor
 
                 self._main_window_widgets.actionNew.setEnabled(False)
                 self._main_window_widgets.actionOpen.setEnabled(False)
+
                 self._main_window_widgets.actionSave.setEnabled(True)
                 self._main_window_widgets.actionClose.setEnabled(True)
                 self._main_window_widgets.actionGenerate.setEnabled(True)
 
             case ApplicationState.BUSY:
                 self._main_window_widgets.menubar.setEnabled(False)
-                self._main_window_widgets.horizontalSplitter.setEnabled(False)
+                self._main_window_widgets.horizontalSplitter.setEnabled(False)  # tree + editor
     # _set_application_state
+
+
+    def _log_message(self, message: str) -> None:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self._main_window_widgets.loggTextWindow.append(f"[{timestamp}] - {message}")
+    # _log_message

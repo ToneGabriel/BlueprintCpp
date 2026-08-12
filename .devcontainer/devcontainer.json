@@ -51,7 +51,7 @@
                 "terminal.integrated.shell.linux": "/bin/bash",
                 "editor.formatOnSave": false,
                 "files.autoSave": "onFocusChange",
-                "todo-tree.ripgrep": "/usr/bin/rg"
+                "todo-tree.ripgrep.ripgrep": "/usr/bin/rg"
             }
         }
     }
