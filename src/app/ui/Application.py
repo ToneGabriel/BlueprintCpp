@@ -8,7 +8,7 @@ from datetime import datetime
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QDialog, QStyle, QTreeWidgetItem)
+    QApplication, QMainWindow, QDialog, QStyle, QTreeWidgetItem, QFileDialog)
 from PySide6.QtGui import (
     QFont, QKeySequence)
 
@@ -46,6 +46,7 @@ class Application:
         self._init_font()
         self._init_main_window()
         self._init_menu_bar()
+        self._init_new_project_dialog()
 
         self._set_application_state(ApplicationState.INIT)
     # __init__
@@ -76,11 +77,11 @@ class Application:
 
 
     def _init_menu_bar(self) -> None:
-        self._main_window_widgets.actionNew.triggered.connect(self._open_project_dialog)
+        self._main_window_widgets.actionNew.triggered.connect(self._open_new_project_dialog)
         self._main_window_widgets.actionNew.setShortcut(QKeySequence.New)
         self._main_window_widgets.actionNew.setIcon(self._main_window.style().standardIcon(QStyle.SP_FileIcon))
 
-        self._main_window_widgets.actionOpen.triggered.connect(self._open_project_dialog)
+        self._main_window_widgets.actionOpen.triggered.connect(self._open_existing_project_dialog)
         self._main_window_widgets.actionOpen.setShortcut(QKeySequence.Open)
         self._main_window_widgets.actionOpen.setIcon(self._main_window.style().standardIcon(QStyle.SP_DirIcon))
 
@@ -104,10 +105,33 @@ class Application:
     # _init_menu_bar
 
 
-    def _open_project_dialog(self) -> None:
-        self._new_project_dialog.exec()
-        self._open_new_project()    # TODO: remove from here
-    # _open_project_dialog
+    def _init_new_project_dialog(self) -> None:
+        self._new_project_dialog_widgets.browseButton.clicked.connect(
+            lambda: self._new_project_dialog_widgets.projectSavePathText.setText(
+                QFileDialog.getExistingDirectory(self._new_project_dialog, "Select Directory", "")
+            )
+        )
+    # _init_new_project_dialog
+
+
+    def _open_new_project_dialog(self) -> None:
+        result = self._new_project_dialog.exec()
+
+        if result == QDialog.Accepted:
+            self._open_new_project()
+        else:
+            # just close the dialog
+            pass
+    # _open_new_project_dialog
+
+
+    def _open_existing_project_dialog(self) -> None:
+        path = QFileDialog.getOpenFileName(self._main_window, "Select project file", "", "Project Files (*.yaml)")
+
+        if path:
+            # TODO: implement
+            pass
+    # _open_existing_project_dialog
 
 
     def _open_new_project(self) -> None:
