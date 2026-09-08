@@ -8,7 +8,7 @@ from datetime import datetime
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QDialog, QStyle, QTreeWidgetItem, QFileDialog)
+    QApplication, QMainWindow, QDialog, QStyle, QTreeWidgetItem, QFileDialog, QMenu)
 from PySide6.QtGui import (
     QFont, QKeySequence)
 
@@ -28,6 +28,7 @@ class Application:
         self._new_project_dialog = QDialog(self._main_window)
         self._close_project_dialog = QDialog(self._main_window)
         self._help_dialog = QDialog(self._main_window)
+        self._tree_menu = QMenu(self._main_window)
 
         # generated widgets
         self._main_window_widgets = mainwindow.Ui_MainWindow()
@@ -47,6 +48,7 @@ class Application:
         self._init_main_window()
         self._init_menu_bar()
         self._init_new_project_dialog()
+        self._init_tree_menu()
 
         self._set_application_state(ApplicationState.INIT)
     # __init__
@@ -73,6 +75,9 @@ class Application:
         self._main_window_widgets.verticalSplitter.setStretchFactor(1, 1)   # logger
 
         self._main_window_widgets.loggTextWindow.setReadOnly(True)
+
+        self._main_window_widgets.projectTree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._main_window_widgets.projectTree.customContextMenuRequested.connect(self._show_context_menu)
     # _init_main_window
 
 
@@ -96,8 +101,7 @@ class Application:
         self._main_window_widgets.actionQuit.setShortcut(QKeySequence.Quit)
         self._main_window_widgets.actionQuit.setIcon(self._main_window.style().standardIcon(QStyle.SP_DialogCloseButton))
 
-        # TODO: add trigger
-        # self._main_window_widgets.actionGenerate.triggered.connect(self.)
+        self._main_window_widgets.actionGenerate.triggered.connect(self._generate_project_files)
         self._main_window_widgets.actionGenerate.setIcon(self._main_window.style().standardIcon(QStyle.SP_MediaPlay))
 
         self._main_window_widgets.actionAbout.triggered.connect(self._open_help_dialog)
@@ -112,6 +116,18 @@ class Application:
             )
         )
     # _init_new_project_dialog
+
+
+    def _init_tree_menu(self) -> None:
+        createSubmenu = self._tree_menu.addMenu("Create...")
+
+        createSubmenu.addAction("Folder", self._create_folder_tree_object)
+        createSubmenu.addAction("Class", self._create_class_tree_object)
+        createSubmenu.addAction("Interface", self._create_interface_tree_object)
+        createSubmenu.addAction("Enum", self._create_enum_tree_object)
+
+        self._tree_menu.addAction("Delete", self._delete_tree_object)
+    # _init_tree_menu
 
 
     def _open_new_project_dialog(self) -> None:
@@ -166,6 +182,14 @@ class Application:
     # _close_project
 
 
+    def _generate_project_files(self) -> None:
+        # TODO: implement
+        self._log_message("Generating project files...")
+        # self._set_application_state(ApplicationState.BUSY)
+        pass
+    # _generate_project_files
+
+
     def _quit_application(self) -> None:
         self._app.quit()
     # _quit_application
@@ -174,6 +198,11 @@ class Application:
     def _open_help_dialog(self) -> None:
         self._help_dialog.exec()
     # _open_help_dialog
+
+
+    def _show_context_menu(self, position) -> None:
+        self._tree_menu.exec(self._main_window_widgets.projectTree.mapToGlobal(position))
+    # _show_context_menu
 
 
     def _set_application_state(self, state: ApplicationState) -> None:
@@ -210,3 +239,51 @@ class Application:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self._main_window_widgets.loggTextWindow.append(f"[{timestamp}] - {message}")
     # _log_message
+
+
+    def _create_class_tree_object(self) -> None:
+        currentItem = self._main_window_widgets.projectTree.currentItem()
+        classItem = QTreeWidgetItem(currentItem)
+        classItem.setText(0, "NewClass")
+        classItem.setFlags(classItem.flags() | Qt.ItemIsEditable)
+        classItem.setIcon(0, self._main_window.style().standardIcon(QStyle.SP_FileIcon))
+    # _create_class_tree_object
+
+
+    def _create_interface_tree_object(self) -> None:
+        currentItem = self._main_window_widgets.projectTree.currentItem()
+        interfaceItem = QTreeWidgetItem(currentItem)
+        interfaceItem.setText(0, "NewInterface")
+        interfaceItem.setFlags(interfaceItem.flags() | Qt.ItemIsEditable)
+        interfaceItem.setIcon(0, self._main_window.style().standardIcon(QStyle.SP_FileIcon))
+    # _create_interface_tree_object
+
+
+    def _create_enum_tree_object(self) -> None:
+        currentItem = self._main_window_widgets.projectTree.currentItem()
+        enumItem = QTreeWidgetItem(currentItem)
+        enumItem.setText(0, "NewEnum")
+        enumItem.setFlags(enumItem.flags() | Qt.ItemIsEditable)
+        enumItem.setIcon(0, self._main_window.style().standardIcon(QStyle.SP_FileIcon))
+    # _create_enum_tree_object
+
+
+    def _create_folder_tree_object(self) -> None:
+        currentItem = self._main_window_widgets.projectTree.currentItem()
+        folderItem = QTreeWidgetItem(currentItem)
+        folderItem.setText(0, "NewFolder")
+        folderItem.setFlags(folderItem.flags() | Qt.ItemIsEditable)
+        folderItem.setIcon(0, self._main_window.style().standardIcon(QStyle.SP_DirIcon))
+    # _create_folder_tree_object
+
+
+    def _delete_tree_object(self) -> None:
+        currentItem = self._main_window_widgets.projectTree.currentItem()
+        parent = currentItem.parent()
+
+        if parent is not None:
+            parent.removeChild(currentItem)
+        else:
+            self._log_message(f"Cannot delete item: {currentItem.text(0)}")
+    # _delete_tree_object
+
