@@ -37,7 +37,11 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_1">
      <item>
-      <widget class="QLineEdit" name="projectSavePathText"/>
+      <widget class="QLineEdit" name="projectSavePathText">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="browseButton">

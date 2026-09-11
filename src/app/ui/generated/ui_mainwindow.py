@@ -91,6 +91,7 @@ class Ui_MainWindow(object):
         self.loggTextWindow.setObjectName(u"loggTextWindow")
         self.loggTextWindow.setFrameShape(QFrame.Shape.StyledPanel)
         self.loggTextWindow.setFrameShadow(QFrame.Shadow.Sunken)
+        self.loggTextWindow.setReadOnly(True)
         self.verticalSplitter.addWidget(self.loggTextWindow)
 
         self.centralWidgetVerticalLayout.addWidget(self.verticalSplitter)

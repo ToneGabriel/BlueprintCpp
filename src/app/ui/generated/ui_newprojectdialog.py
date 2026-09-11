@@ -46,6 +46,7 @@ class Ui_NewProjectDialog(object):
         self.horizontalLayout_1.setObjectName(u"horizontalLayout_1")
         self.projectSavePathText = QLineEdit(NewProjectDialog)
         self.projectSavePathText.setObjectName(u"projectSavePathText")
+        self.projectSavePathText.setReadOnly(True)
 
         self.horizontalLayout_1.addWidget(self.projectSavePathText)
 
