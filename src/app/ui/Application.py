@@ -12,7 +12,7 @@ from datetime import datetime
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QDialog, QStyle, QTreeWidgetItem, QFileDialog, QMenu)
+    QApplication, QMainWindow, QDialog, QStyle, QTreeWidgetItem, QTableWidgetItem, QFileDialog, QMenu, QTextEdit)
 from PySide6.QtGui import (
     QFont, QKeySequence)
 
@@ -108,7 +108,8 @@ class Application:
         self._main_window_widgets.verticalSplitter.setStretchFactor(1, 1)   # logger
 
         self._main_window_widgets.projectTree.setContextMenuPolicy(Qt.CustomContextMenu)
-        self._main_window_widgets.projectTree.customContextMenuRequested.connect(self._show_context_menu)
+        self._main_window_widgets.projectTree.customContextMenuRequested.connect(self._show_tree_context_menu)
+        self._main_window_widgets.projectTree.currentItemChanged.connect(self._on_tree_item_changed)
     # _init_main_window
 
 
@@ -198,7 +199,7 @@ class Application:
 
 
     def _save_project(self) -> None:
-        # TODO: implement
+        self._main_window_widgets.projectTree.setCurrentItem(None)  # forces item change save
         self._log_message("Project successfully saved!")
     # _save_project
 
@@ -238,9 +239,73 @@ class Application:
     # _open_help
 
 
-    def _show_context_menu(self, position) -> None:
+    def _show_tree_context_menu(self, position) -> None:
         self._tree_menu.exec(self._main_window_widgets.projectTree.mapToGlobal(position))
-    # _show_context_menu
+    # _show_tree_context_menu
+
+
+    def _on_tree_item_changed(self, currentItem: QTreeWidgetItem, previousItem: QTreeWidgetItem) -> None:
+        # Save data from previous item
+        if previousItem:
+            previousItemType: TreeItemType = previousItem.data(0, Qt.UserRole)
+            previousItemData: dict = previousItem.data(0, Qt.UserRole + 1)
+
+            match previousItemType:
+                case TreeItemType.FOLDER:
+                    pass
+                case TreeItemType.CLASS | TreeItemType.INTERFACE | TreeItemType.ENUM:
+                    descriptionEditor: QTextEdit = self._main_window_widgets.propertiesTable.cellWidget(0, 1)
+                    previousItemData["description"] = descriptionEditor.toPlainText()
+                    previousItem.setData(0, Qt.UserRole + 1, previousItemData)
+
+                case TreeItemType.MEMBER:
+                    pass
+
+                case TreeItemType.METHOD:
+                    pass
+
+                case TreeItemType.PARAMETER:
+                    pass
+
+                case _:
+                    self._log_message(f"Cannot save data for item type: {previousItemType.name}")
+
+
+        # Clear table contents
+        self._main_window_widgets.propertiesTable.clearContents()
+        self._main_window_widgets.propertiesTable.setRowCount(0)
+
+
+        # Show data on current item
+        if currentItem:
+            currentItemType: TreeItemType = currentItem.data(0, Qt.UserRole)
+            currentItemData: dict = currentItem.data(0, Qt.UserRole + 1)
+
+            match currentItemType:
+                case TreeItemType.FOLDER:
+                    pass
+
+                case TreeItemType.CLASS | TreeItemType.INTERFACE | TreeItemType.ENUM:
+                    self._main_window_widgets.propertiesTable.setRowCount(1)
+                    self._main_window_widgets.propertiesTable.setRowHeight(0, 150)
+
+                    self._main_window_widgets.propertiesTable.setItem(0, 0, QTableWidgetItem("Description"))
+
+                    descriptionEditor = QTextEdit(currentItemData.get("description", ""))
+                    self._main_window_widgets.propertiesTable.setCellWidget(0, 1, descriptionEditor)
+
+                case TreeItemType.MEMBER:
+                    pass
+
+                case TreeItemType.METHOD:
+                    pass
+
+                case TreeItemType.PARAMETER:
+                    pass
+
+                case _:
+                    self._log_message(f"Cannot display item type: {currentItemType.name}")
+    # _on_tree_item_changed
 
 
     def _set_application_state(self, state: ApplicationState) -> None:
@@ -402,17 +467,18 @@ class Application:
 
     def _create_tree_folder_structure_recursive(self, item: QTreeWidgetItem, current_path: Path):
         name = item.text(0)
-        item_type = item.data(0, Qt.UserRole)
+        itemType = item.data(0, Qt.UserRole)
         full_path = current_path / name
 
-        if item_type in TREE_ITEM_FOLDER_TYPE:
-            full_path.mkdir(parents=True, exist_ok=True)
-            for i in range(item.childCount()):
-                self._create_tree_folder_structure_recursive(item.child(i), full_path)
-        elif item_type in TREE_ITEM_FILE_TYPE:
-            full_path.touch()
-        else:
-            pass
+        match itemType:
+            case TreeItemType.FOLDER:
+                full_path.mkdir(parents=True, exist_ok=True)
+                for i in range(item.childCount()):
+                    self._create_tree_folder_structure_recursive(item.child(i), full_path)
+            case TreeItemType.CLASS | TreeItemType.INTERFACE | TreeItemType.ENUM:
+                full_path.touch()
+            case _:
+                pass
     # _create_tree_folder_structure_recursive
 
 
