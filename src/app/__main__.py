@@ -1,16 +1,10 @@
 import app.impl as impl
 import app.config as config
 import app.ui as ui
-import app.ui.generated.ui_mainwindow as mainwindow
 
 
 import argparse
 from pathlib import Path
-
-import sys
-from PySide6.QtWidgets import QApplication, QLabel, QMainWindow
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QColor, QPalette
 
 
 def parse_arguments() -> argparse.Namespace:

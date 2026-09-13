@@ -3,9 +3,12 @@ import app.ui.generated.ui_newprojectdialog as newprojectdialog
 import app.ui.generated.ui_closeprojectdialog as closeprojectdialog
 import app.ui.generated.ui_helpdialog as helpdialog
 
-from enum import Enum
-from datetime import datetime
+import app.impl as impl
+
+from enum import Enum, Flag, auto
+from typing import Any
 from pathlib import Path
+from datetime import datetime
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -20,16 +23,28 @@ class ApplicationState(Enum):
     BUSY = 2
 
 
-class TreeItemType(Enum):
-    FOLDER  = 0
-    FILE    = 1
-    OTHER   = 2
+class TreeItemType(Flag):
+    FOLDER      = auto()
+    CLASS       = auto()
+    INTERFACE   = auto()
+    ENUM        = auto()
+    MEMBER      = auto()
+    METHOD      = auto()
+    PARAMETER   = auto()
+
+
+TREE_ITEM_FOLDER_TYPE = TreeItemType.FOLDER
+TREE_ITEM_FILE_TYPE   = TreeItemType.CLASS | TreeItemType.INTERFACE | TreeItemType.ENUM
 
 
 TREE_ITEM_ICON_MAP = {
-    TreeItemType.FOLDER: QStyle.SP_DirIcon,
-    TreeItemType.FILE:   QStyle.SP_FileIcon,
-    TreeItemType.OTHER:  QStyle.SP_TitleBarNormalButton
+    TreeItemType.FOLDER:    QStyle.SP_DirIcon,
+    TreeItemType.CLASS:     QStyle.SP_FileIcon,
+    TreeItemType.INTERFACE: QStyle.SP_FileIcon,
+    TreeItemType.ENUM:      QStyle.SP_FileIcon,
+    TreeItemType.MEMBER:    QStyle.SP_TitleBarNormalButton,
+    TreeItemType.METHOD:    QStyle.SP_ToolBarHorizontalExtensionButton,
+    TreeItemType.PARAMETER: QStyle.SP_TitleBarNormalButton
 }
 
 
@@ -141,6 +156,8 @@ class Application:
         createSubmenu.addAction("Class",     self._create_class_tree_object)
         createSubmenu.addAction("Interface", self._create_interface_tree_object)
         createSubmenu.addAction("Enum",      self._create_enum_tree_object)
+        createSubmenu.addAction("Member",    self._create_member_tree_object)
+        createSubmenu.addAction("Method",    self._create_method_tree_object)
         createSubmenu.addAction("Parameter", self._create_parameter_tree_object)
 
         self._tree_menu.addAction("Delete", self._delete_tree_object)
@@ -160,7 +177,7 @@ class Application:
                 self._project_name = name
                 self._project_path = path
 
-                self._create_tree_object(name, TreeItemType.FOLDER, TreeItemType.FOLDER, False, True)
+                self._create_tree_object(name, TreeItemType.FOLDER, TreeItemType.FOLDER, None, False)
                 self._set_application_state(ApplicationState.OPEN)
 
             self._new_project_dialog_widgets.projectNameText.setText(None)
@@ -256,51 +273,110 @@ class Application:
     # _set_application_state
 
 
-    def _create_class_tree_object(self) -> None:
-        self._create_tree_object("NewClass", TreeItemType.FILE, TreeItemType.FOLDER)
-    # _create_class_tree_object
-
-
-    def _create_interface_tree_object(self) -> None:
-        self._create_tree_object("NewInterface", TreeItemType.FILE, TreeItemType.FOLDER)
-    # _create_interface_tree_object
-
-
-    def _create_enum_tree_object(self) -> None:
-        self._create_tree_object("NewEnum", TreeItemType.FILE, TreeItemType.FOLDER)
-    # _create_enum_tree_object
-
-
     def _create_folder_tree_object(self) -> None:
         self._create_tree_object("NewFolder", TreeItemType.FOLDER, TreeItemType.FOLDER)
     # _create_folder_tree_object
 
 
+    def _create_class_tree_object(self) -> None:
+        data = {
+            "description": ""
+        }
+
+        self._create_tree_object("NewClass", TreeItemType.CLASS, TreeItemType.FOLDER, data)
+    # _create_class_tree_object
+
+
+    def _create_interface_tree_object(self) -> None:
+        data = {
+            "description": ""
+        }
+
+        self._create_tree_object("NewInterface", TreeItemType.INTERFACE, TreeItemType.FOLDER, data)
+    # _create_interface_tree_object
+
+
+    def _create_enum_tree_object(self) -> None:
+        data = {
+            "description": ""
+        }
+
+        self._create_tree_object("NewEnum", TreeItemType.ENUM, TreeItemType.FOLDER, data)
+    # _create_enum_tree_object
+
+
+    def _create_member_tree_object(self) -> None:
+        data = {
+            "description": "",
+            "visibility": impl.model.Visibility.PRIVATE,
+            "type": "",
+            "indirection": "",
+            "const": False,
+            "volatile": False,
+            "default": ""
+        }
+
+        self._create_tree_object("NewMember", TreeItemType.MEMBER, TreeItemType.CLASS, data)
+    # _create_member_tree_object
+
+
+    def _create_method_tree_object(self) -> None:
+        data = {
+            "description": "",
+            "visibility": impl.model.Visibility.PUBLIC,
+            "type": "",
+            "indirection": "",
+            "const": False,
+            "volatile": False,
+            "immutable": False,
+            "noexcept": False,
+            "override": False
+        }
+
+        self._create_tree_object("NewMethod", TreeItemType.METHOD, TreeItemType.CLASS | TreeItemType.INTERFACE, data)
+    # _create_method_tree_object
+
+
     def _create_parameter_tree_object(self) -> None:
-        self._create_tree_object("NewParameter", TreeItemType.OTHER, TreeItemType.FILE)
+        data = {
+            "description": "",
+            "type": "",
+            "indirection": "",
+            "const": False,
+            "volatile": False,
+            "default": ""
+        }
+
+        self._create_tree_object("NewParameter", TreeItemType.PARAMETER, TreeItemType.METHOD, data)
     # _create_parameter_tree_object
 
 
-    def _create_tree_object(self, name: str, type: TreeItemType, parentRequiredType: TreeItemType, isEditable: bool = True, isRoot: bool = False) -> None:
+    def _create_tree_object(self,
+                            name: str,
+                            type: TreeItemType,
+                            parentRequiredType: TreeItemType,
+                            data: Any = None,
+                            isEditable: bool = True) -> None:
         tree = self._main_window_widgets.projectTree
 
-        if not isRoot:
-            currentItem = tree.currentItem()
-            if currentItem is None or currentItem.data(0, Qt.UserRole) != parentRequiredType:
-                self._log_message("Object creation failed")
-                return
+        currentItem = tree.currentItem()
+        if currentItem is None:
+            currentItem = tree.invisibleRootItem()
+
+        currentItemType = currentItem.data(0, Qt.UserRole)
+        if currentItemType is not None and currentItemType not in parentRequiredType:
+            self._log_message(f"Object creation failed: {type.name}")
+            return
 
         item = QTreeWidgetItem([name])
         item.setIcon(0, self._main_window.style().standardIcon(TREE_ITEM_ICON_MAP[type]))
         item.setData(0, Qt.UserRole, type)
+        item.setData(0, Qt.UserRole + 1, data)
 
         if isEditable:
             item.setFlags(item.flags() | Qt.ItemIsEditable)
 
-        if isRoot:
-            tree.addTopLevelItem(item)
-        else:
-            currentItem.addChild(item)
+        currentItem.addChild(item)
     # _create_tree_object
 
 
@@ -329,12 +405,14 @@ class Application:
         item_type = item.data(0, Qt.UserRole)
         full_path = current_path / name
 
-        if item_type == TreeItemType.FOLDER:
+        if item_type in TREE_ITEM_FOLDER_TYPE:
             full_path.mkdir(parents=True, exist_ok=True)
             for i in range(item.childCount()):
                 self._create_tree_folder_structure_recursive(item.child(i), full_path)
-        elif item_type == TreeItemType.FILE:
+        elif item_type in TREE_ITEM_FILE_TYPE:
             full_path.touch()
+        else:
+            pass
     # _create_tree_folder_structure_recursive
 
 
