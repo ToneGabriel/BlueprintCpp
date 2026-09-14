@@ -10,6 +10,14 @@ class Visibility(Enum):
 
 
 # ==============================================================================
+class Indirection(Enum):
+    NONE        = ""
+    PPINTER     = "*"
+    REFERENCE   = "&"
+    UREFERENCE  = "&&"
+
+
+# ==============================================================================
 class Parameter:
     def __init__(self,
                  name: str = "_defaultMember",

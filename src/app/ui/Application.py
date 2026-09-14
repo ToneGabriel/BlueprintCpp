@@ -2,17 +2,18 @@ import app.ui.generated.ui_mainwindow as mainwindow
 import app.ui.generated.ui_newprojectdialog as newprojectdialog
 import app.ui.generated.ui_closeprojectdialog as closeprojectdialog
 import app.ui.generated.ui_helpdialog as helpdialog
+import app.ui.helpers as uihelpers
 
 import app.impl as impl
 
 from enum import Enum, Flag, auto
-from typing import Any
+from typing import Any, Type
 from pathlib import Path
 from datetime import datetime
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QDialog, QStyle, QTreeWidgetItem, QTableWidgetItem, QFileDialog, QMenu, QTextEdit)
+    QApplication, QMainWindow, QDialog, QStyle, QTreeWidgetItem, QTableWidgetItem, QFileDialog, QMenu, QTextEdit, QLineEdit, QComboBox, QTableWidget, QTreeWidget)
 from PySide6.QtGui import (
     QFont, QKeySequence)
 
@@ -245,36 +246,55 @@ class Application:
 
 
     def _on_tree_item_changed(self, currentItem: QTreeWidgetItem, previousItem: QTreeWidgetItem) -> None:
-        # Save data from previous item
+        # Save data for previous item
         if previousItem:
             previousItemType: TreeItemType = previousItem.data(0, Qt.UserRole)
-            previousItemData: dict = previousItem.data(0, Qt.UserRole + 1)
+            previousItemNewData: dict = {}
 
             match previousItemType:
                 case TreeItemType.FOLDER:
                     pass
+
                 case TreeItemType.CLASS | TreeItemType.INTERFACE | TreeItemType.ENUM:
-                    descriptionEditor: QTextEdit = self._main_window_widgets.propertiesTable.cellWidget(0, 1)
-                    previousItemData["description"] = descriptionEditor.toPlainText()
-                    previousItem.setData(0, Qt.UserRole + 1, previousItemData)
+                    previousItemNewData["description"]  = uihelpers.get_text_table_row_data(self._main_window_widgets.propertiesTable,      0)
+                    previousItem.setData(0, Qt.UserRole + 1, previousItemNewData)
 
                 case TreeItemType.MEMBER:
-                    pass
+                    previousItemNewData["description"]  = uihelpers.get_text_table_row_data(self._main_window_widgets.propertiesTable,      0)
+                    previousItemNewData["visibility"]   = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  1)
+                    previousItemNewData["type"]         = uihelpers.get_line_table_row_data(self._main_window_widgets.propertiesTable,      2)
+                    previousItemNewData["indirection"]  = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  3)
+                    previousItemNewData["const"]        = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  4)
+                    previousItemNewData["volatile"]     = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  5)
+                    previousItemNewData["default"]      = uihelpers.get_line_table_row_data(self._main_window_widgets.propertiesTable,      6)
+                    previousItem.setData(0, Qt.UserRole + 1, previousItemNewData)
 
                 case TreeItemType.METHOD:
-                    pass
+                    previousItemNewData["description"]  = uihelpers.get_text_table_row_data(self._main_window_widgets.propertiesTable,      0)
+                    previousItemNewData["visibility"]   = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  1)
+                    previousItemNewData["type"]         = uihelpers.get_line_table_row_data(self._main_window_widgets.propertiesTable,      2)
+                    previousItemNewData["indirection"]  = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  3)
+                    previousItemNewData["const"]        = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  4)
+                    previousItemNewData["volatile"]     = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  5)
+                    previousItemNewData["immutable"]    = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  6)
+                    previousItemNewData["noexcept"]     = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  7)
+                    previousItemNewData["override"]     = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  8)
+                    previousItem.setData(0, Qt.UserRole + 1, previousItemNewData)
 
                 case TreeItemType.PARAMETER:
-                    pass
+                    previousItemNewData["description"]  = uihelpers.get_text_table_row_data(self._main_window_widgets.propertiesTable,      0)
+                    previousItemNewData["type"]         = uihelpers.get_line_table_row_data(self._main_window_widgets.propertiesTable,      1)
+                    previousItemNewData["indirection"]  = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  2)
+                    previousItemNewData["const"]        = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  3)
+                    previousItemNewData["volatile"]     = uihelpers.get_dropdown_table_row_data(self._main_window_widgets.propertiesTable,  4)
+                    previousItemNewData["default"]      = uihelpers.get_line_table_row_data(self._main_window_widgets.propertiesTable,      5)
+                    previousItem.setData(0, Qt.UserRole + 1, previousItemNewData)
 
                 case _:
                     self._log_message(f"Cannot save data for item type: {previousItemType.name}")
 
-
         # Clear table contents
-        self._main_window_widgets.propertiesTable.clearContents()
-        self._main_window_widgets.propertiesTable.setRowCount(0)
-
+        uihelpers.clear_table_contents(self._main_window_widgets.propertiesTable)
 
         # Show data on current item
         if currentItem:
@@ -286,22 +306,39 @@ class Application:
                     pass
 
                 case TreeItemType.CLASS | TreeItemType.INTERFACE | TreeItemType.ENUM:
-                    self._main_window_widgets.propertiesTable.setRowCount(1)
-                    self._main_window_widgets.propertiesTable.setRowHeight(0, 150)
-
-                    self._main_window_widgets.propertiesTable.setItem(0, 0, QTableWidgetItem("Description"))
-
-                    descriptionEditor = QTextEdit(currentItemData.get("description", ""))
-                    self._main_window_widgets.propertiesTable.setCellWidget(0, 1, descriptionEditor)
+                    uihelpers.initialise_table_row_count(self._main_window_widgets.propertiesTable, 1)
+                    uihelpers.create_text_table_row(self._main_window_widgets.propertiesTable,      0, "Description",                                                                   currentItemData.get("description", ""))
 
                 case TreeItemType.MEMBER:
-                    pass
+                    uihelpers.initialise_table_row_count(self._main_window_widgets.propertiesTable, 7)
+                    uihelpers.create_text_table_row(self._main_window_widgets.propertiesTable,      0, "Description",                                                                   currentItemData.get("description", ""))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  1, "Visibility",    [(member.value, member) for member in impl.model.Visibility],   currentItemData.get("visibility", impl.model.Visibility.PRIVATE))
+                    uihelpers.create_line_table_row(self._main_window_widgets.propertiesTable,      2, "Type",                                                                          currentItemData.get("type", "void"))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  3, "Indirection",   [(member.value, member) for member in impl.model.Indirection],  currentItemData.get("indirection", impl.model.Indirection.NONE))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  4, "Is Const",      [("False", False), ("True", True)],                             currentItemData.get("const", False))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  5, "Is Volatile",   [("False", False), ("True", True)],                             currentItemData.get("volatile", False))
+                    uihelpers.create_line_table_row(self._main_window_widgets.propertiesTable,      6, "Default Value",                                                                 currentItemData.get("default", ""))
 
                 case TreeItemType.METHOD:
-                    pass
+                    uihelpers.initialise_table_row_count(self._main_window_widgets.propertiesTable, 9)
+                    uihelpers.create_text_table_row(self._main_window_widgets.propertiesTable,      0, "Description",                                                                   currentItemData.get("description", ""))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  1, "Visibility",    [(member.value, member) for member in impl.model.Visibility],   currentItemData.get("visibility", impl.model.Visibility.PUBLIC))
+                    uihelpers.create_line_table_row(self._main_window_widgets.propertiesTable,      2, "Return Type",                                                                   currentItemData.get("type", "void"))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  3, "Indirection",   [(member.value, member) for member in impl.model.Indirection],  currentItemData.get("indirection", impl.model.Indirection.NONE))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  4, "Is Const",      [("False", False), ("True", True)],                             currentItemData.get("const", False))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  5, "Is Volatile",   [("False", False), ("True", True)],                             currentItemData.get("volatile", False))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  6, "Is Immutable",  [("False", False), ("True", True)],                             currentItemData.get("immutable", False))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  7, "Is Noexcept",   [("False", False), ("True", True)],                             currentItemData.get("noexcept", False))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  8, "Is Overriden",  [("False", False), ("True", True)],                             currentItemData.get("override", False))
 
                 case TreeItemType.PARAMETER:
-                    pass
+                    uihelpers.initialise_table_row_count(self._main_window_widgets.propertiesTable, 6)
+                    uihelpers.create_text_table_row(self._main_window_widgets.propertiesTable,      0, "Description",                                                                   currentItemData.get("description", ""))
+                    uihelpers.create_line_table_row(self._main_window_widgets.propertiesTable,      1, "Type",                                                                          currentItemData.get("type", "void"))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  2, "Indirection",   [(member.value, member) for member in impl.model.Indirection],  currentItemData.get("indirection", impl.model.Indirection.NONE))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  3, "Is Const",      [("False", False), ("True", True)],                             currentItemData.get("const", False))
+                    uihelpers.create_dropdown_table_row(self._main_window_widgets.propertiesTable,  4, "Is Volatile",   [("False", False), ("True", True)],                             currentItemData.get("volatile", False))
+                    uihelpers.create_line_table_row(self._main_window_widgets.propertiesTable,      5, "Default Value",                                                                 currentItemData.get("default", ""))
 
                 case _:
                     self._log_message(f"Cannot display item type: {currentItemType.name}")
@@ -375,7 +412,7 @@ class Application:
             "description": "",
             "visibility": impl.model.Visibility.PRIVATE,
             "type": "",
-            "indirection": "",
+            "indirection": impl.model.Indirection.NONE,
             "const": False,
             "volatile": False,
             "default": ""
@@ -390,7 +427,7 @@ class Application:
             "description": "",
             "visibility": impl.model.Visibility.PUBLIC,
             "type": "",
-            "indirection": "",
+            "indirection": impl.model.Indirection.NONE,
             "const": False,
             "volatile": False,
             "immutable": False,
@@ -406,7 +443,7 @@ class Application:
         data = {
             "description": "",
             "type": "",
-            "indirection": "",
+            "indirection": impl.model.Indirection.NONE,
             "const": False,
             "volatile": False,
             "default": ""
