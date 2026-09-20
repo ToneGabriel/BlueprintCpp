@@ -46,6 +46,42 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # open_project
 
 
+    def open_new_project(self) -> None:
+        # TODO: implement
+        pass
+    # open_new_project
+
+
+    def open_existing_project(self) -> None:
+        # TODO: implement
+        pass
+    # open_existing_project
+
+
+    def save_project(self) -> None:
+        # TODO: implement
+        pass
+    # save_project
+
+
+    def close_project(self) -> None:
+        # TODO: implement
+        pass
+    # close_project
+
+
+    def quit_application(self) -> None:
+        # TODO: implement
+        pass
+    # quit_application
+
+
+    def generate_code(self) -> None:
+        # TODO: implement
+        pass
+    # generate_code
+
+
     # ===========================================================================
     # ITreeManager functionality
     # ===========================================================================

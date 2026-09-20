@@ -74,3 +74,8 @@ class UiEnvironment:
         self._main_window.showMaximized()
         self._app.exec()
     # run
+
+
+    def quit(self) -> None:
+        self._app.quit()
+    # quit

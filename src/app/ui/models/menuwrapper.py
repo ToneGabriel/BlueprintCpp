@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import (QTextEdit, QMenuBar)
-from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QTextEdit, QMenuBar, QStyle
+from PySide6.QtGui import QAction, QKeySequence
 
 from app.ui.common import ApplicationState, MenubarAction
 from app.ui.interfaces import IMenu, IMenuManager
@@ -11,6 +11,31 @@ class MenuWrapper(IMenu):
         self._menubar_actions = actions
 
         self._manager_reference = None
+
+        # self._menubar_actions[MenubarAction.ACTION_NEW].triggered.connect(self._open_new_project)
+        self._menubar_actions[MenubarAction.ACTION_NEW].setShortcut(QKeySequence.New)
+        self._menubar_actions[MenubarAction.ACTION_NEW].setIcon(self._menubar.style().standardIcon(QStyle.SP_FileIcon))
+
+        # self._menubar_actions[MenubarAction.ACTION_OPEN].triggered.connect(self._open_existing_project)
+        self._menubar_actions[MenubarAction.ACTION_OPEN].setShortcut(QKeySequence.Open)
+        self._menubar_actions[MenubarAction.ACTION_OPEN].setIcon(self._menubar.style().standardIcon(QStyle.SP_DirIcon))
+
+        # self._menubar_actions[MenubarAction.ACTION_SAVE].triggered.connect(self._save_project)
+        self._menubar_actions[MenubarAction.ACTION_SAVE].setShortcut(QKeySequence.Save)
+        self._menubar_actions[MenubarAction.ACTION_SAVE].setIcon(self._menubar.style().standardIcon(QStyle.SP_DialogSaveButton))
+
+        # self._menubar_actions[MenubarAction.ACTION_CLOSE].triggered.connect(self._close_project)
+        self._menubar_actions[MenubarAction.ACTION_CLOSE].setShortcut(QKeySequence.Close)
+
+        # self._menubar_actions[MenubarAction.ACTION_QUIT].triggered.connect(self._quit_application)
+        self._menubar_actions[MenubarAction.ACTION_QUIT].setShortcut(QKeySequence.Quit)
+        self._menubar_actions[MenubarAction.ACTION_QUIT].setIcon(self._menubar.style().standardIcon(QStyle.SP_DialogCloseButton))
+
+        # self._menubar_actions[MenubarAction.ACTION_GENERATE].triggered.connect(self._generate_project_files)
+        self._menubar_actions[MenubarAction.ACTION_GENERATE].setIcon(self._menubar.style().standardIcon(QStyle.SP_MediaPlay))
+
+        # self._menubar_actions[MenubarAction.ACTION_ABOUT].triggered.connect(self._open_help)
+        self._menubar_actions[MenubarAction.ACTION_ABOUT].setIcon(self._menubar.style().standardIcon(QStyle.SP_TitleBarContextHelpButton))
     # __init__
 
 

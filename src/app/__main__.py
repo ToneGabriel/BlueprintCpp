@@ -116,9 +116,10 @@ def main() -> None:
 
 
 def main_ui() -> None:
+    manager = ui.AppManager()
+
     env = ui.UiEnvironment()
 
-    manager = ui.AppManager()
     logger  = ui.LoggerWrapper(env.get_logger_widget())
     menu    = ui.MenuWrapper(env.get_menubar_widget(), env.get_menubar_action_widgets())
     tree    = ui.TreeWrapper(env.get_tree_widget())
