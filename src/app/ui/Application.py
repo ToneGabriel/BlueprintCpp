@@ -34,10 +34,6 @@ class TreeItemType(Flag):
     PARAMETER   = auto()
 
 
-TREE_ITEM_FOLDER_TYPE = TreeItemType.FOLDER
-TREE_ITEM_FILE_TYPE   = TreeItemType.CLASS | TreeItemType.INTERFACE | TreeItemType.ENUM
-
-
 TREE_ITEM_ICON_MAP = {
     TreeItemType.FOLDER:    QStyle.SP_DirIcon,
     TreeItemType.CLASS:     QStyle.SP_FileIcon,

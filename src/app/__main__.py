@@ -116,8 +116,27 @@ def main() -> None:
 
 
 def main_ui() -> None:
-    app = ui.Application()
-    app.run()
+    env = ui.UiEnvironment()
+
+    manager = ui.AppManager()
+    logger  = ui.LoggerWrapper(env.get_logger_widget())
+    menu    = ui.MenuWrapper(env.get_menubar_widget())
+    tree    = ui.TreeWrapper(env.get_tree_widget())
+    table   = ui.TableWrapper(env.get_table_widget())
+
+    manager.set_logger_reference(logger)
+    manager.set_menu_reference(menu)
+    manager.set_table_reference(table)
+    manager.set_tree_reference(tree)
+
+    menu.set_logger_reference(logger)
+
+    tree.set_logger_reference(logger)
+    tree.set_table_reference(table)
+
+    table.set_logger_reference(logger)
+
+    env.run()
 
 
 if __name__ == "__main__":
