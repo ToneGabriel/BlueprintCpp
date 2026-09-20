@@ -32,30 +32,36 @@ class TreeWrapper(ITree):
     # __init__
 
 
+    # ===========================================================================
+    # Setters
+    # ===========================================================================
     def set_manager_reference(self, manager) -> None:
         self._manager_reference = manager
     # set_manager_reference
 
 
+    # ===========================================================================
+    # IState functionality
+    # ===========================================================================
     def set_state(self, newState: ApplicationState) -> None:
-        # TODO: implement
-
         match newState:
             case ApplicationState.INIT:
-                pass
+                self._tree.setEnabled(False)
 
             case ApplicationState.OPEN:
-                pass
+                self._tree.setEnabled(True)
 
             case ApplicationState.BUSY:
-                pass
+                self._tree.setEnabled(True)
 
             case _:
                 self._manager_reference.log_message(f"Invalid state: {newState.name}")
-
     # set_state
 
 
+    # ===========================================================================
+    # Helpers
+    # ===========================================================================
     def _init_tree(self) -> None:
         self._tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self._tree.customContextMenuRequested.connect(self._show_tree_context_menu)

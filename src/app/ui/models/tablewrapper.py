@@ -21,30 +21,36 @@ class TableWrapper(ITable):
     # __init__
 
 
+    # ===========================================================================
+    # Setters
+    # ===========================================================================
     def set_manager_reference(self, manager: ITableManager) -> None:
         self._manager_reference = manager
     # set_manager_reference
 
 
+    # ===========================================================================
+    # IState functionality
+    # ===========================================================================
     def set_state(self, newState: ApplicationState) -> None:
-        # TODO: implement
-
         match newState:
             case ApplicationState.INIT:
-                pass
+                self._table.setEnabled(False)
 
             case ApplicationState.OPEN:
-                pass
+                self._table.setEnabled(True)
 
             case ApplicationState.BUSY:
-                pass
+                self._table.setEnabled(False)
 
             case _:
                 self._manager_reference.log_message(f"Invalid state: {newState.name}")
-
     # set_state
 
 
+    # ===========================================================================
+    # ITable functionality
+    # ===========================================================================
     def get_table_contents(self) -> dict[str, Any]:
         data = {}
 
@@ -93,7 +99,7 @@ class TableWrapper(ITable):
     def display_table_contents(self, display: DisplayItemType, data: dict[str, Any]) -> None:
         match display:
             case DisplayItemType.FOLDER:
-                pass
+                self._initialise_table_row_count(0)
 
             case DisplayItemType.CLASS | DisplayItemType.INTERFACE | DisplayItemType.ENUM:
                 self._initialise_table_row_count(1)
@@ -141,6 +147,9 @@ class TableWrapper(ITable):
     # display_table_contents
 
 
+    # ===========================================================================
+    # Helpers
+    # ===========================================================================
     def _initialise_table_row_count(self, count: int) -> None:
         if self._table.rowCount() > 0:
             self._clear_table_contents()

@@ -17,6 +17,11 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # ===========================================================================
     # Setters
     # ===========================================================================
+    def set_menu_reference(self, menu: IMenu) -> None:
+        self._menu_reference = menu
+    # set_menu_reference
+
+
     def set_logger_reference(self, logger: ILogger) -> None:
         self._logger_reference = logger
     # set_logger_reference
@@ -32,11 +37,6 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # set_table_reference
 
 
-    def set_menu_reference(self, menu: IMenu) -> None:
-        self._menu_reference = menu
-    # set_menu_reference
-
-
     # ===========================================================================
     # IMenuManager functionality
     # ===========================================================================
@@ -50,14 +50,12 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # ITreeManager functionality
     # ===========================================================================
     def display_table_contents(self, display: DisplayItemType, data: dict[str, Any]) -> None:
-        # TODO: implement
-        pass
+        self._table_reference.display_table_contents(display, data)
     # display_table_contents
 
 
     def get_table_contents(self) -> dict[str, Any]:
-        # TODO: implement
-        pass
+        return self._table_reference.get_table_contents()
     # get_table_contents
 
 
@@ -79,9 +77,9 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # Helpers
     # ===========================================================================
     def _set_application_state(self, state: ApplicationState) -> None:
+        self._menu_reference.set_state(state)
+        self._logger_reference.set_state(state)
         self._tree_reference.set_state(state)
         self._table_reference.set_state(state)
-        self._logger_reference.set_state(state)
-        self._menu_reference.set_state(state)
     # _set_application_state
 

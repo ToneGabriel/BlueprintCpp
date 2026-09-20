@@ -3,7 +3,7 @@ from app.ui.generated import (Ui_MainWindow, Ui_CloseProjectDialog, Ui_NewProjec
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QDialog, QStyle,
+    QApplication, QMainWindow, QDialog, QStyle, QMenuBar,
     QTreeWidgetItem, QTableWidgetItem, QFileDialog,
     QMenu, QTextEdit, QLineEdit, QComboBox, QTableWidget, QTreeWidget)
 from PySide6.QtGui import (QFont, QKeySequence, QAction)
@@ -49,6 +49,11 @@ class UiEnvironment:
     # get_menubar_action_widgets
 
 
+    def get_menubar_widget(self) -> QMenuBar:
+        return self._main_window_widgets.menubar
+    # get_menubar_widget
+
+
     def get_logger_widget(self) -> QTextEdit:
         return self._main_window_widgets.loggTextWindow
     # get_logger_widget
@@ -69,5 +74,3 @@ class UiEnvironment:
         self._main_window.showMaximized()
         self._app.exec()
     # run
-
-

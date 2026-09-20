@@ -14,17 +14,26 @@ class LoggerWrapper(ILogger):
     # __init__
 
 
+    # ===========================================================================
+    # Setters
+    # ===========================================================================
     def set_manager_reference(self, manager: ILoggerManager) -> None:
         self._manager_reference = manager
     # set_manager_reference
 
 
+    # ===========================================================================
+    # IState functionality
+    # ===========================================================================
     def set_state(self, newState: ApplicationState) -> None:
         # logger will always be active
         return
     # set_state
 
 
+    # ===========================================================================
+    # ILogger functionality
+    # ===========================================================================
     def log_message(self, message: str) -> None:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self._logger.append(f"[{timestamp}] - {message}")

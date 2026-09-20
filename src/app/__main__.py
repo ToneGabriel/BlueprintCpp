@@ -120,7 +120,7 @@ def main_ui() -> None:
 
     manager = ui.AppManager()
     logger  = ui.LoggerWrapper(env.get_logger_widget())
-    menu    = ui.MenuWrapper(env.get_menubar_action_widgets())
+    menu    = ui.MenuWrapper(env.get_menubar_widget(), env.get_menubar_action_widgets())
     tree    = ui.TreeWrapper(env.get_tree_widget())
     table   = ui.TableWrapper(env.get_table_widget())
 
