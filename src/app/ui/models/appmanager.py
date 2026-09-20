@@ -1,8 +1,11 @@
-from app.ui.common import ApplicationState
-from app.ui.interfaces import (ILogger, ITree, ITable, IMenu)
+from typing import Any
+
+from app.ui.common import ApplicationState, DisplayItemType
+from app.ui.interfaces import (ILogger, ITree, ITable, IMenu,
+                               ILoggerManager, ITreeManager, ITableManager, IMenuManager)
 
 
-class AppManager:
+class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    # Note: ILoggerManager is last because the rest inherits from it
     def __init__(self):
         self._logger_reference: ILogger = None
         self._tree_reference: ITree = None
@@ -11,6 +14,9 @@ class AppManager:
     # __init__
 
 
+    # ===========================================================================
+    # Setters
+    # ===========================================================================
     def set_logger_reference(self, logger: ILogger) -> None:
         self._logger_reference = logger
     # set_logger_reference
@@ -31,11 +37,47 @@ class AppManager:
     # set_menu_reference
 
 
+    # ===========================================================================
+    # IMenuManager functionality
+    # ===========================================================================
     def open_project(self) -> None:
+        # TODO: implement
         self._set_application_state(ApplicationState.OPEN)
     # open_project
 
 
+    # ===========================================================================
+    # ITreeManager functionality
+    # ===========================================================================
+    def display_table_contents(self, display: DisplayItemType, data: dict[str, Any]) -> None:
+        # TODO: implement
+        pass
+    # display_table_contents
+
+
+    def get_table_contents(self) -> dict[str, Any]:
+        # TODO: implement
+        pass
+    # get_table_contents
+
+
+    # ===========================================================================
+    # ITableManager functionality
+    # ===========================================================================
+    # TODO: add and implement
+
+
+    # ===========================================================================
+    # ILoggerManager functionality
+    # ===========================================================================
+    def log_message(self, message: str) -> None:
+        self._logger_reference.log_message(message)
+    # log_message
+
+
+    # ===========================================================================
+    # Helpers
+    # ===========================================================================
     def _set_application_state(self, state: ApplicationState) -> None:
         self._tree_reference.set_state(state)
         self._table_reference.set_state(state)

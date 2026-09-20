@@ -3,7 +3,8 @@ from enum import Enum, Flag, auto
 
 __all__ = [
     "ApplicationState",
-    "DisplayItemType"
+    "DisplayItemType",
+    "MenubarAction"
 ]
 
 
@@ -23,3 +24,12 @@ class DisplayItemType(Flag):
     METHOD      = auto()
     PARAMETER   = auto()
 
+
+class MenubarAction(Enum):
+    ACTION_NEW      = auto()
+    ACTION_OPEN     = auto()
+    ACTION_SAVE     = auto()
+    ACTION_CLOSE    = auto()
+    ACTION_QUIT     = auto()
+    ACTION_GENERATE = auto()
+    ACTION_ABOUT    = auto()

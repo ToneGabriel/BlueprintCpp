@@ -1,14 +1,12 @@
-import app.ui.generated.ui_mainwindow as mainwindow
-import app.ui.generated.ui_newprojectdialog as newprojectdialog
-import app.ui.generated.ui_closeprojectdialog as closeprojectdialog
-import app.ui.generated.ui_helpdialog as helpdialog
+from app.ui.common import MenubarAction
+from app.ui.generated import (Ui_MainWindow, Ui_CloseProjectDialog, Ui_NewProjectDialog, Ui_HelpDialog)
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QDialog, QStyle,
     QTreeWidgetItem, QTableWidgetItem, QFileDialog,
     QMenu, QTextEdit, QLineEdit, QComboBox, QTableWidget, QTreeWidget)
-from PySide6.QtGui import (QFont, QKeySequence)
+from PySide6.QtGui import (QFont, QKeySequence, QAction)
 
 
 class UiEnvironment:
@@ -20,27 +18,35 @@ class UiEnvironment:
         self._new_project_dialog = QDialog(self._main_window)
         self._close_project_dialog = QDialog(self._main_window)
         self._help_dialog = QDialog(self._main_window)
-        self._tree_menu = QMenu(self._main_window)
 
         # generated widgets
-        self._main_window_widgets = mainwindow.Ui_MainWindow()
+        self._main_window_widgets = Ui_MainWindow()
         self._main_window_widgets.setupUi(self._main_window)
 
-        self._new_project_dialog_widgets = newprojectdialog.Ui_NewProjectDialog()
+        self._new_project_dialog_widgets = Ui_NewProjectDialog()
         self._new_project_dialog_widgets.setupUi(self._new_project_dialog)
 
-        self._close_project_dialog_widgets = closeprojectdialog.Ui_CloseProjectDialog()
+        self._close_project_dialog_widgets = Ui_CloseProjectDialog()
         self._close_project_dialog_widgets.setupUi(self._close_project_dialog)
 
-        self._help_dialog_widgets = helpdialog.Ui_HelpDialog()
+        self._help_dialog_widgets = Ui_HelpDialog()
         self._help_dialog_widgets.setupUi(self._help_dialog)
     # __init__
 
 
-    def get_menubar_widget(self) -> QMenuBar:
-        # TODO: implement
-        pass
-    # get_menubar_widget
+    def get_menubar_action_widgets(self) -> dict[MenubarAction, QAction]:
+        actions = {
+            MenubarAction.ACTION_NEW:       self._main_window_widgets.actionNew,
+            MenubarAction.ACTION_OPEN:      self._main_window_widgets.actionOpen,
+            MenubarAction.ACTION_SAVE:      self._main_window_widgets.actionSave,
+            MenubarAction.ACTION_CLOSE:     self._main_window_widgets.actionClose,
+            MenubarAction.ACTION_QUIT:      self._main_window_widgets.actionQuit,
+            MenubarAction.ACTION_GENERATE:  self._main_window_widgets.actionGenerate,
+            MenubarAction.ACTION_ABOUT:     self._main_window_widgets.actionAbout
+        }
+
+        return actions
+    # get_menubar_action_widgets
 
 
     def get_logger_widget(self) -> QTextEdit:

@@ -3,13 +3,20 @@ from PySide6.QtWidgets import (QTextEdit)
 from datetime import datetime
 
 from app.ui.common import ApplicationState
-from app.ui.interfaces import ILogger
+from app.ui.interfaces import ILogger, ILoggerManager
 
 
 class LoggerWrapper(ILogger):
     def __init__(self, logger: QTextEdit):
         self._logger = logger
+
+        self._manager_reference = None
     # __init__
+
+
+    def set_manager_reference(self, manager: ILoggerManager) -> None:
+        self._manager_reference = manager
+    # set_manager_reference
 
 
     def set_state(self, newState: ApplicationState) -> None:

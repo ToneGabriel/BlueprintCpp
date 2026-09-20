@@ -120,7 +120,7 @@ def main_ui() -> None:
 
     manager = ui.AppManager()
     logger  = ui.LoggerWrapper(env.get_logger_widget())
-    menu    = ui.MenuWrapper(env.get_menubar_widget())
+    menu    = ui.MenuWrapper(env.get_menubar_action_widgets())
     tree    = ui.TreeWrapper(env.get_tree_widget())
     table   = ui.TableWrapper(env.get_table_widget())
 
@@ -129,12 +129,10 @@ def main_ui() -> None:
     manager.set_table_reference(table)
     manager.set_tree_reference(tree)
 
-    menu.set_logger_reference(logger)
-
-    tree.set_logger_reference(logger)
-    tree.set_table_reference(table)
-
-    table.set_logger_reference(logger)
+    logger.set_manager_reference(manager)
+    menu.set_manager_reference(manager)
+    tree.set_manager_reference(manager)
+    table.set_manager_reference(manager)
 
     env.run()
 

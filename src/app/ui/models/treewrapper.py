@@ -5,7 +5,7 @@ from enum import Enum, Flag, auto
 from typing import Any, Type
 
 from app.ui.common import DisplayItemType, ApplicationState
-from app.ui.interfaces import (ITree, ITable, ILogger)
+from app.ui.interfaces import (ITree, ITreeManager)
 
 
 TREE_ITEM_ICON_STYLE_MAP = {
@@ -25,22 +25,16 @@ class TreeWrapper(ITree):
         self._tree = tree
         self._tree_menu = QMenu(self._tree)
 
-        self._table_reference: ITable = None
-        self._logger_reference: ILogger = None
+        self._manager_reference: ITreeManager = None
 
         self._init_tree()
         self._init_tree_menu()
     # __init__
 
 
-    def set_table_reference(self, table: ITable) -> None:
-        self._table_reference = table
-    # set_table_reference
-
-
-    def set_logger_reference(self, logger: ILogger) -> None:
-        self._logger_reference = logger
-    # set_logger_reference
+    def set_manager_reference(self, manager) -> None:
+        self._manager_reference = manager
+    # set_manager_reference
 
 
     def set_state(self, newState: ApplicationState) -> None:
@@ -57,7 +51,7 @@ class TreeWrapper(ITree):
                 pass
 
             case _:
-                self._logger_reference.log_message(f"Invalid state: {newState.name}")
+                self._manager_reference.log_message(f"Invalid state: {newState.name}")
 
     # set_state
 
@@ -131,7 +125,7 @@ class TreeWrapper(ITree):
 
         currentItemType = currentItem.data(0, Qt.UserRole)
         if currentItemType is not None and currentItemType not in parentRequiredType:
-            self._logger_reference.log_message(f"Object creation failed: {type.name}")
+            self._manager_reference.log_message(f"Object creation failed: {type.name}")
             return
 
         item = QTreeWidgetItem([name])
@@ -153,7 +147,7 @@ class TreeWrapper(ITree):
         if parent is not None:
             parent.removeChild(currentItem)
         else:
-            self._logger_reference.log_message(f"Cannot delete object: {currentItem.text(0)}")
+            self._manager_reference.log_message(f"Cannot delete object: {currentItem.text(0)}")
     # _delete_tree_object
 
 
@@ -165,11 +159,11 @@ class TreeWrapper(ITree):
     def _on_tree_item_changed(self, currentItem: QTreeWidgetItem, previousItem: QTreeWidgetItem) -> None:
         # Save data for previous item
         if previousItem:
-            previousItem.setData(0, Qt.UserRole + 1, self._table_reference.get_table_contents())
+            previousItem.setData(0, Qt.UserRole + 1, self._manager_reference.get_table_contents())
 
         # Show data on current item
         if currentItem:
             currentItemType: DisplayItemType = currentItem.data(0, Qt.UserRole)
             currentItemData: dict = currentItem.data(0, Qt.UserRole + 1)
-            self._table_reference.display_table_contents(currentItemType, currentItemData)
+            self._manager_reference.display_table_contents(currentItemType, currentItemData)
     # _on_tree_item_changed

@@ -1,18 +1,21 @@
 from PySide6.QtWidgets import (QTextEdit)
+from PySide6.QtGui import QAction
 
-from app.ui.common import ApplicationState
-from app.ui.interfaces import ILogger, IMenu
+from app.ui.common import ApplicationState, MenubarAction
+from app.ui.interfaces import IMenu, IMenuManager
 
 
 class MenuWrapper(IMenu):
-    def __init__(self):
-        self._logger_reference = None
+    def __init__(self, actions: dict[MenubarAction, QAction]):
+        self._menubar_actions = actions
+
+        self._manager_reference = None
     # __init__
 
 
-    def set_logger_reference(self, logger: ILogger) -> None:
-        self._logger_reference = logger
-    # set_logger_reference
+    def set_manager_reference(self, manager: IMenuManager) -> None:
+        self._manager_reference = manager
+    # set_manager_reference
 
 
     def set_state(self, newState: ApplicationState) -> None:
@@ -29,7 +32,7 @@ class MenuWrapper(IMenu):
                 pass
 
             case _:
-                self._logger_reference.log_message(f"Invalid state: {newState.name}")
+                self._manager_reference.log_message(f"Invalid state: {newState.name}")
     # set_state
 
 

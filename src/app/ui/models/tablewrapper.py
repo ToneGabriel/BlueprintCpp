@@ -5,14 +5,14 @@ from typing import Any, Type
 
 import app.impl as impl
 from app.ui.common import DisplayItemType, ApplicationState
-from app.ui.interfaces import ILogger, ITable
+from app.ui.interfaces import ITable, ITableManager
 
 
 class TableWrapper(ITable):
     def __init__(self, table: QTableWidget):
         self._table = table
 
-        self._logger_reference = None
+        self._manager_reference: ITableManager = None
 
         self._current_display = DisplayItemType.FOLDER
         self._visibility_dropdown_items = [(member.value, member) for member in impl.model.Visibility]
@@ -21,9 +21,9 @@ class TableWrapper(ITable):
     # __init__
 
 
-    def set_logger_reference(self, logger: ILogger) -> None:
-        self._logger_reference = logger
-    # set_logger_reference
+    def set_manager_reference(self, manager: ITableManager) -> None:
+        self._manager_reference = manager
+    # set_manager_reference
 
 
     def set_state(self, newState: ApplicationState) -> None:
@@ -40,7 +40,7 @@ class TableWrapper(ITable):
                 pass
 
             case _:
-                self._logger_reference.log_message(f"Invalid state: {newState.name}")
+                self._manager_reference.log_message(f"Invalid state: {newState.name}")
 
     # set_state
 
@@ -84,7 +84,7 @@ class TableWrapper(ITable):
                 data["default"]     = self._get_line_table_row_data(5)
 
             case _:
-                self._logger_reference.log_message(f"Cannot get data for: {self._current_display.name}")
+                self._manager_reference.log_message(f"Cannot get data for: {self._current_display.name}")
 
         return data
     # get_table_contents
@@ -135,7 +135,7 @@ class TableWrapper(ITable):
                 self._create_line_table_row(5,      "Default Value",                                 data.get("default", ""))
 
             case _:
-                self._logger_reference.log_message(f"Cannot display data for: {display.name}")
+                self._manager_reference.log_message(f"Cannot display data for: {display.name}")
 
         self._current_display = display
     # display_table_contents
