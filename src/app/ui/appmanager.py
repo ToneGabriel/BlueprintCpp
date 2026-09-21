@@ -1,4 +1,5 @@
 from typing import Any
+from pathlib import Path
 
 from app.ui.common import ApplicationState, DisplayItemType
 from app.ui.interfaces import (ILogger, ITree, ITable, IMenu,
@@ -8,6 +9,11 @@ from app.ui.interfaces import (ILogger, ITree, ITable, IMenu,
 
 class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    # Note: ILoggerManager is the last because the rest inherit from it
     def __init__(self):
+        # internal data
+        self._project_name = ""
+        self._project_path = ""
+
+        # references
         self._logger_reference: ILogger = None
         self._tree_reference: ITree = None
         self._table_reference: ITable = None
@@ -47,20 +53,21 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # ===========================================================================
     # IMenuManager functionality
     # ===========================================================================
-    def open_project(self) -> None:
-        # TODO: implement
-        self._set_application_state(ApplicationState.OPEN)
-    # open_project
+    def open_new_project(self, name: str, path: str) -> None:
+        if name == "" or path == "" or not Path(path).exists():
+            self.log_message("Invalid project name or path")
+        else:
+            self._project_name = name
+            self._project_path = path
 
-
-    def open_new_project(self) -> None:
-        # TODO: implement
-        pass
+            # self._create_tree_object(name, TreeItemType.FOLDER, TreeItemType.FOLDER, None, False) # TODO: implement
+            self._set_application_state(ApplicationState.OPEN)
     # open_new_project
 
 
-    def open_existing_project(self) -> None:
+    def open_existing_project(self, path: str) -> None:
         # TODO: implement
+        # self._set_application_state(ApplicationState.OPEN)
         pass
     # open_existing_project
 
@@ -72,7 +79,8 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
 
 
     def close_project(self) -> None:
-        # TODO: implement
+        self._tree_reference.clear()
+        self._table_reference.clear()
         self._set_application_state(ApplicationState.INIT)
     # close_project
 
@@ -92,12 +100,12 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # ITreeManager functionality
     # ===========================================================================
     def display_table_contents(self, display: DisplayItemType, data: dict[str, Any]) -> None:
-        self._table_reference.display_table_contents(display, data)
+        self._table_reference.display_contents(display, data)
     # display_table_contents
 
 
     def get_table_contents(self) -> dict[str, Any]:
-        return self._table_reference.get_table_contents()
+        return self._table_reference.get_contents()
     # get_table_contents
 
 

@@ -13,5 +13,3 @@ class ITreeManager(ILoggerManager):
     @abstractmethod
     def get_table_contents(self) -> dict[str, Any]:...
 
-
-

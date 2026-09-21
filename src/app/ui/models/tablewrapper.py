@@ -51,7 +51,7 @@ class TableWrapper(ITable):
     # ===========================================================================
     # ITable functionality
     # ===========================================================================
-    def get_table_contents(self) -> dict[str, Any]:
+    def get_contents(self) -> dict[str, Any]:
         data = {}
 
         match self._current_display:
@@ -93,10 +93,10 @@ class TableWrapper(ITable):
                 self._manager_reference.log_message(f"Cannot get data for: {self._current_display.name}")
 
         return data
-    # get_table_contents
+    # get_contents
 
 
-    def display_table_contents(self, display: DisplayItemType, data: dict[str, Any]) -> None:
+    def display_contents(self, display: DisplayItemType, data: dict[str, Any]) -> None:
         match display:
             case DisplayItemType.FOLDER:
                 self._initialise_table_row_count(0)
@@ -144,7 +144,12 @@ class TableWrapper(ITable):
                 self._manager_reference.log_message(f"Cannot display data for: {display.name}")
 
         self._current_display = display
-    # display_table_contents
+    # display_contents
+
+
+    def clear(self) -> None:
+        self._clear_table_contents()
+    # clear
 
 
     # ===========================================================================

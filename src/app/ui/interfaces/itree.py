@@ -4,5 +4,6 @@ from .istate import IState
 
 
 class ITree(IState):
-    # TODO: implement
-    pass
+
+    @abstractmethod
+    def clear(self) -> None:...

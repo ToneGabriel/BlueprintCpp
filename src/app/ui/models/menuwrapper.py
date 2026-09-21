@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QTextEdit, QMenuBar, QStyle
+from PySide6.QtWidgets import QTextEdit, QMenuBar, QStyle, QDialog, QFileDialog
 from PySide6.QtGui import QAction, QKeySequence
 
 from app.ui.common import ApplicationState, MenubarUIPacket, NewProjectDialogUIPacket, CloseProjectDialogUIPacket, HelpDialogUIPacket
@@ -20,11 +20,11 @@ class MenuWrapper(IMenu):
         self._manager_reference = None
 
         # initialization
-        # self._menubarUIPacket.actionNew.triggered.connect(self._open_new_project)
+        self._menubarUIPacket.actionNew.triggered.connect(self._open_new_project)
         self._menubarUIPacket.actionNew.setShortcut(QKeySequence.New)
         self._menubarUIPacket.actionNew.setIcon(self._menubarUIPacket.menubar.style().standardIcon(QStyle.SP_FileIcon))
 
-        # self._menubarUIPacket.actionOpen.triggered.connect(self._open_existing_project)
+        self._menubarUIPacket.actionOpen.triggered.connect(self._open_existing_project)
         self._menubarUIPacket.actionOpen.setShortcut(QKeySequence.Open)
         self._menubarUIPacket.actionOpen.setIcon(self._menubarUIPacket.menubar.style().standardIcon(QStyle.SP_DirIcon))
 
@@ -89,13 +89,40 @@ class MenuWrapper(IMenu):
     # ===========================================================================
     # Helpers
     # ===========================================================================
+    def _open_new_project(self) -> None:
+        result = self._newProjectDialogUIPacket.dialog.exec()
+
+        if result == QDialog.Accepted:
+            name = self._newProjectDialogUIPacket.projectNameText.text()
+            path = self._newProjectDialogUIPacket.projectSavePathText.text()
+
+            self._manager_reference.open_new_project(name, path)
+
+        self._newProjectDialogUIPacket.projectNameText.setText(None)
+        self._newProjectDialogUIPacket.projectSavePathText.setText(None)
+    # _open_new_project
+
+
+    def _open_existing_project(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(self._menubarUIPacket.menubar, "Select project file", "", "Project Files (*.yaml)")
+
+        self._manager_reference.open_existing_project(path)
+    # _open_existing_project
+
+
     def _save_project(self) -> None:
         self._manager_reference.save_project()
     # _save_project
 
 
-    def _close_project(self) -> None:
-        self._manager_reference.close_project()
+    def _close_project(self) -> bool:
+        result = self._closeProjectDialogUIPacket.dialog.exec()
+
+        if result == QDialog.Accepted:
+            self._manager_reference.close_project()
+            return True
+
+        return False
     # _close_project
 
 
@@ -105,7 +132,8 @@ class MenuWrapper(IMenu):
 
 
     def _quit_application(self) -> None:
-        self._manager_reference.quit_application()
+        if self._close_project():
+            self._manager_reference.quit_application()
     # _quit_application
 
 
