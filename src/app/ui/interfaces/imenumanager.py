@@ -22,3 +22,5 @@ class IMenuManager(ILoggerManager):
 
     @abstractmethod
     def generate_project_files(self) -> None:...
+
+# IMenuManager

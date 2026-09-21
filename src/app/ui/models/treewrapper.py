@@ -62,6 +62,11 @@ class TreeWrapper(ITree):
     # ===========================================================================
     # ITree functionality
     # ===========================================================================
+    def create_root(self, name: str) -> None:
+        self._create_tree_object(name, DisplayItemType.FOLDER, None, False)
+    # create_root
+
+
     def clear(self) -> None:
         self._uipacket.tree.clear()
     # clear_tree
@@ -181,3 +186,5 @@ class TreeWrapper(ITree):
             currentItemData: dict = currentItem.data(0, Qt.UserRole + 1)
             self._manager_reference.display_table_contents(currentItemType, currentItemData)
     # _on_tree_item_changed
+
+# TreeWrapper

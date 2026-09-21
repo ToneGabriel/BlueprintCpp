@@ -116,8 +116,9 @@ def main() -> None:
 
 
 def main_ui() -> None:
-    env = ui.UiEnvironment()
+    manager = ui.AppManager()
 
+    env     = ui.UiEnvironment()
     menu    = ui.MenuWrapper(env.get_menubar_uipacket(),
                              env.get_new_project_dialog_uipacket(),
                              env.get_close_project_dialog_uipacket(),
@@ -126,20 +127,18 @@ def main_ui() -> None:
     tree    = ui.TreeWrapper(env.get_tree_uipacket())
     table   = ui.TableWrapper(env.get_table_uipacket())
 
-    manager = ui.AppManager()
-
     manager.set_logger_reference(logger)
     manager.set_menu_reference(menu)
     manager.set_table_reference(table)
     manager.set_tree_reference(tree)
-    manager.set_quit_reference(env)
+    manager.set_qt_root_reference(env)
 
     logger.set_manager_reference(manager)
     menu.set_manager_reference(manager)
     tree.set_manager_reference(manager)
     table.set_manager_reference(manager)
 
-    env.run()
+    manager.run()
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ from pathlib import Path
 from app.ui.common import ApplicationState, DisplayItemType
 from app.ui.interfaces import (ILogger, ITree, ITable, IMenu,
                                ILoggerManager, ITreeManager, ITableManager, IMenuManager,
-                               IQuit)
+                               IQtRoot)
 
 
 class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    # Note: ILoggerManager is the last because the rest inherit from it
@@ -18,7 +18,7 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
         self._tree_reference: ITree = None
         self._table_reference: ITable = None
         self._menu_reference: IMenu = None
-        self._quit_reference: IQuit = None
+        self._qt_root_reference: IQtRoot = None
     # __init__
 
 
@@ -45,9 +45,18 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # set_table_reference
 
 
-    def set_quit_reference(self, quit: IQuit) -> None:
-        self._quit_reference = quit
-    # set_quit_reference
+    def set_qt_root_reference(self, qt_root: IQtRoot) -> None:
+        self._qt_root_reference = qt_root
+    # set_qt_root_reference
+
+
+    # ===========================================================================
+    # Entry point
+    # ===========================================================================
+    def run(self) -> None:
+        self._set_application_state(ApplicationState.INIT)
+        self._qt_root_reference.run()
+    # run
 
 
     # ===========================================================================
@@ -60,7 +69,8 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
             self._project_name = name
             self._project_path = path
 
-            # self._create_tree_object(name, TreeItemType.FOLDER, TreeItemType.FOLDER, None, False) # TODO: implement
+            self._tree_reference.create_root(name)
+
             self._set_application_state(ApplicationState.OPEN)
     # open_new_project
 
@@ -86,7 +96,8 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
 
 
     def quit_application(self) -> None:
-        self._quit_reference.quit()
+        self.close_project()
+        self._qt_root_reference.quit()
     # quit_application
 
 
@@ -112,7 +123,7 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # ===========================================================================
     # ITableManager functionality
     # ===========================================================================
-    # TODO: add and implement
+    # None so far
 
 
     # ===========================================================================
@@ -133,3 +144,4 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
         self._table_reference.set_state(state)
     # _set_application_state
 
+# AppManager

@@ -44,3 +44,4 @@ class LoggerWrapper(ILogger):
         self._uipacket.logger.clear()
     # clear_logs
 
+# LoggerWrapper

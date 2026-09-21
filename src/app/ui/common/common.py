@@ -11,6 +11,7 @@ class ApplicationState(Enum):
     INIT = auto()
     OPEN = auto()
     BUSY = auto()
+# ApplicationState
 
 
 class DisplayItemType(Flag):
@@ -22,3 +23,4 @@ class DisplayItemType(Flag):
     MEMBER      = auto()
     METHOD      = auto()
     PARAMETER   = auto()
+# DisplayItemType

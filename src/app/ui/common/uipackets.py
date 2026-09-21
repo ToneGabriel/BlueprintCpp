@@ -18,16 +18,19 @@ __all__ = [
 @dataclass
 class TreeUIPacket:
     tree: QTreeWidget
+# TreeUIPacket
 
 
 @dataclass
 class TableUIPacket:
     table: QTableWidget
+# TableUIPacket
 
 
 @dataclass
 class LoggerUIPacket:
     logger: QTextEdit
+# LoggerUIPacket
 
 
 @dataclass
@@ -40,6 +43,7 @@ class MenubarUIPacket:
     actionQuit: QAction
     actionGenerate: QAction
     actionAbout: QAction
+# MenubarUIPacket
 
 
 @dataclass
@@ -48,14 +52,16 @@ class NewProjectDialogUIPacket:
     browseButton: QPushButton
     projectNameText: QLineEdit
     projectSavePathText: QLineEdit
+# NewProjectDialogUIPacket
 
 
 @dataclass
 class CloseProjectDialogUIPacket:
     dialog: QDialog
+# CloseProjectDialogUIPacket
 
 
 @dataclass
 class HelpDialogUIPacket:
     dialog: QDialog
-
+# HelpDialogUIPacket

@@ -1,17 +1,13 @@
-from app.ui.interfaces import IQuit
+from app.ui.interfaces import IQtRoot
 from app.ui.generated import (Ui_MainWindow, Ui_CloseProjectDialog, Ui_NewProjectDialog, Ui_HelpDialog)
 from app.ui.common import (TreeUIPacket, TableUIPacket, LoggerUIPacket, MenubarUIPacket,
                            HelpDialogUIPacket, NewProjectDialogUIPacket, CloseProjectDialogUIPacket)
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QDialog, QStyle, QMenuBar,
-    QTreeWidgetItem, QTableWidgetItem, QFileDialog,
-    QMenu, QTextEdit, QLineEdit, QComboBox, QTableWidget, QTreeWidget)
-from PySide6.QtGui import (QFont, QKeySequence, QAction)
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (QApplication, QMainWindow, QDialog, QStyle)
 
 
-class UiEnvironment(IQuit):
+class UiEnvironment(IQtRoot):
     def __init__(self):
         # main widgets
         self._app = QApplication([])
@@ -97,7 +93,7 @@ class UiEnvironment(IQuit):
 
 
     # ===========================================================================
-    # Entry point
+    # IQtRoot functionality
     # ===========================================================================
     def run(self) -> None:
         self._main_window.resize(1200, 800)
@@ -106,9 +102,8 @@ class UiEnvironment(IQuit):
     # run
 
 
-    # ===========================================================================
-    # IQuit functionality
-    # ===========================================================================
     def quit(self) -> None:
         self._app.quit()
     # quit
+
+# UiEnvironment

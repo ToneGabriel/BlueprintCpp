@@ -232,3 +232,5 @@ class TableWrapper(ITable):
 
         return dropdown.currentData()
     # _get_dropdown_table_row_data
+
+# TableWrapper

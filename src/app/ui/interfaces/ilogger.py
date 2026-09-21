@@ -10,3 +10,5 @@ class ILogger(IState):
 
     @abstractmethod
     def clear_logs(self) -> None:...
+
+# ILogger

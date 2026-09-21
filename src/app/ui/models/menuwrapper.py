@@ -44,6 +44,8 @@ class MenuWrapper(IMenu):
 
         self._menubarUIPacket.actionAbout.triggered.connect(self._open_help)
         self._menubarUIPacket.actionAbout.setIcon(self._menubarUIPacket.menubar.style().standardIcon(QStyle.SP_TitleBarContextHelpButton))
+
+        self._newProjectDialogUIPacket.browseButton.clicked.connect(self._browse_new_project_folder)
     # __init__
 
 
@@ -89,6 +91,13 @@ class MenuWrapper(IMenu):
     # ===========================================================================
     # Helpers
     # ===========================================================================
+    def _browse_new_project_folder(self) -> None:
+        path = QFileDialog.getExistingDirectory(self._newProjectDialogUIPacket.dialog, "Select Directory", "")
+
+        self._newProjectDialogUIPacket.projectSavePathText.setText(path)
+    # _browse_new_project_folder
+
+
     def _open_new_project(self) -> None:
         result = self._newProjectDialogUIPacket.dialog.exec()
 
@@ -132,8 +141,7 @@ class MenuWrapper(IMenu):
 
 
     def _quit_application(self) -> None:
-        if self._close_project():
-            self._manager_reference.quit_application()
+        self._manager_reference.quit_application()
     # _quit_application
 
 
@@ -141,3 +149,4 @@ class MenuWrapper(IMenu):
         self._helpDialogUIPacket.dialog.exec()
     # _open_help
 
+# MenuWrapper

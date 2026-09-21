@@ -8,4 +8,4 @@ from .iloggermanager import ILoggerManager
 from .itreemanager import ITreeManager
 from .itablemanager import ITableManager
 
-from .iquit import IQuit
+from .iqtroot import IQtRoot

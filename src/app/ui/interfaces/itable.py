@@ -16,3 +16,4 @@ class ITable(IState):
     @abstractmethod
     def clear(self) -> None:...
 
+# ITable
