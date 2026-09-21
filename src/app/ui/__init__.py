@@ -1,2 +1,2 @@
-from .uienvironment import UiEnvironment
+from .appmanager import AppManager
 from .models import *

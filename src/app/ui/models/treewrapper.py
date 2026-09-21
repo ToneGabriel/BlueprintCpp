@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (QTreeWidgetItem, QTreeWidget, QStyle, QMenu)
 from enum import Enum, Flag, auto
 from typing import Any, Type
 
-from app.ui.common import DisplayItemType, ApplicationState
+from app.ui.common import DisplayItemType, ApplicationState, TreeUIPacket
 from app.ui.interfaces import (ITree, ITreeManager)
 
 
@@ -21,9 +21,9 @@ TREE_ITEM_ICON_STYLE_MAP = {
 
 
 class TreeWrapper(ITree):
-    def __init__(self, tree: QTreeWidget):
-        self._tree = tree
-        self._tree_menu = QMenu(self._tree)
+    def __init__(self, uipacket: TreeUIPacket):
+        self._uipacket = uipacket
+        self._tree_menu = QMenu(self._uipacket.tree)
 
         self._manager_reference: ITreeManager = None
 
@@ -46,13 +46,13 @@ class TreeWrapper(ITree):
     def set_state(self, newState: ApplicationState) -> None:
         match newState:
             case ApplicationState.INIT:
-                self._tree.setEnabled(False)
+                self._uipacket.tree.setEnabled(False)
 
             case ApplicationState.OPEN:
-                self._tree.setEnabled(True)
+                self._uipacket.tree.setEnabled(True)
 
             case ApplicationState.BUSY:
-                self._tree.setEnabled(True)
+                self._uipacket.tree.setEnabled(True)
 
             case _:
                 self._manager_reference.log_message(f"Invalid state: {newState.name}")
@@ -63,9 +63,9 @@ class TreeWrapper(ITree):
     # Helpers
     # ===========================================================================
     def _init_tree(self) -> None:
-        self._tree.setContextMenuPolicy(Qt.CustomContextMenu)
-        self._tree.customContextMenuRequested.connect(self._show_tree_context_menu)
-        self._tree.currentItemChanged.connect(self._on_tree_item_changed)
+        self._uipacket.tree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._uipacket.tree.customContextMenuRequested.connect(self._show_tree_context_menu)
+        self._uipacket.tree.currentItemChanged.connect(self._on_tree_item_changed)
     # _init_tree
 
 
@@ -125,9 +125,9 @@ class TreeWrapper(ITree):
                             parentRequiredType: DisplayItemType,
                             isEditable: bool = True
     ) -> None:
-        currentItem = self._tree.currentItem()
+        currentItem = self._uipacket.tree.currentItem()
         if currentItem is None:
-            currentItem = self._tree.invisibleRootItem()
+            currentItem = self._uipacket.tree.invisibleRootItem()
 
         currentItemType = currentItem.data(0, Qt.UserRole)
         if currentItemType is not None and currentItemType not in parentRequiredType:
@@ -135,7 +135,7 @@ class TreeWrapper(ITree):
             return
 
         item = QTreeWidgetItem([name])
-        item.setIcon(0, self._tree.style().standardIcon(TREE_ITEM_ICON_STYLE_MAP[type]))
+        item.setIcon(0, self._uipacket.tree.style().standardIcon(TREE_ITEM_ICON_STYLE_MAP[type]))
         item.setData(0, Qt.UserRole, type)
         item.setData(0, Qt.UserRole + 1, {})
 
@@ -147,7 +147,7 @@ class TreeWrapper(ITree):
 
 
     def _delete_tree_object(self) -> None:
-        currentItem = self._tree.currentItem()
+        currentItem = self._uipacket.tree.currentItem()
         parent = currentItem.parent()
 
         if parent is not None:
@@ -158,7 +158,7 @@ class TreeWrapper(ITree):
 
 
     def _show_tree_context_menu(self, position) -> None:
-        self._tree_menu.exec(self._tree.mapToGlobal(position))
+        self._tree_menu.exec(self._uipacket.tree.mapToGlobal(position))
     # _show_tree_context_menu
 
 

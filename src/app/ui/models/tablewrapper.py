@@ -4,13 +4,13 @@ from PySide6.QtWidgets import (QTableWidget, QTableWidgetItem, QStyle, QTextEdit
 from typing import Any, Type
 
 import app.impl as impl
-from app.ui.common import DisplayItemType, ApplicationState
+from app.ui.common import DisplayItemType, ApplicationState, TableUIPacket
 from app.ui.interfaces import ITable, ITableManager
 
 
 class TableWrapper(ITable):
-    def __init__(self, table: QTableWidget):
-        self._table = table
+    def __init__(self, uipacket: TableUIPacket):
+        self._uipacket = uipacket
 
         self._manager_reference: ITableManager = None
 
@@ -35,13 +35,13 @@ class TableWrapper(ITable):
     def set_state(self, newState: ApplicationState) -> None:
         match newState:
             case ApplicationState.INIT:
-                self._table.setEnabled(False)
+                self._uipacket.table.setEnabled(False)
 
             case ApplicationState.OPEN:
-                self._table.setEnabled(True)
+                self._uipacket.table.setEnabled(True)
 
             case ApplicationState.BUSY:
-                self._table.setEnabled(False)
+                self._uipacket.table.setEnabled(False)
 
             case _:
                 self._manager_reference.log_message(f"Invalid state: {newState.name}")
@@ -151,16 +151,16 @@ class TableWrapper(ITable):
     # Helpers
     # ===========================================================================
     def _initialise_table_row_count(self, count: int) -> None:
-        if self._table.rowCount() > 0:
+        if self._uipacket.table.rowCount() > 0:
             self._clear_table_contents()
 
-        self._table.setRowCount(count)
+        self._uipacket.table.setRowCount(count)
     # _initialise_table_row_count
 
 
     def _clear_table_contents(self) -> None:
-        self._table.clearContents()
-        self._table.setRowCount(0)
+        self._uipacket.table.clearContents()
+        self._uipacket.table.setRowCount(0)
     # _clear_table_contents
 
 
@@ -168,14 +168,14 @@ class TableWrapper(ITable):
         label = QLabel(title)
         textEditor = QTextEdit(dataToSet)
 
-        self._table.setRowHeight(row, 150)
-        self._table.setCellWidget(row, 0, label)
-        self._table.setCellWidget(row, 1, textEditor)
+        self._uipacket.table.setRowHeight(row, 150)
+        self._uipacket.table.setCellWidget(row, 0, label)
+        self._uipacket.table.setCellWidget(row, 1, textEditor)
     # _create_text_table_row
 
 
     def _get_text_table_row_data(self, row: int) -> str:
-        textEditor: QTextEdit = self._table.cellWidget(row, 1)
+        textEditor: QTextEdit = self._uipacket.table.cellWidget(row, 1)
 
         if not isinstance(textEditor, QTextEdit):
             return
@@ -188,13 +188,13 @@ class TableWrapper(ITable):
         label = QLabel(title)
         lineEditor = QLineEdit(dataToSet)
 
-        self._table.setCellWidget(row, 0,label)
-        self._table.setCellWidget(row, 1, lineEditor)
+        self._uipacket.table.setCellWidget(row, 0,label)
+        self._uipacket.table.setCellWidget(row, 1, lineEditor)
     # _create_line_table_row
 
 
     def _get_line_table_row_data(self, row: int) -> str:
-        lineEditor: QLineEdit = self._table.cellWidget(row, 1)
+        lineEditor: QLineEdit = self._uipacket.table.cellWidget(row, 1)
 
         if not isinstance(lineEditor, QLineEdit):
             return
@@ -214,13 +214,13 @@ class TableWrapper(ITable):
         if index != -1:
             dropdown.setCurrentIndex(index)
 
-        self._table.setCellWidget(row, 0, label)
-        self._table.setCellWidget(row, 1, dropdown)
+        self._uipacket.table.setCellWidget(row, 0, label)
+        self._uipacket.table.setCellWidget(row, 1, dropdown)
     # _create_dropdown_table_row
 
 
     def _get_dropdown_table_row_data(self, row: int) -> Any:
-        dropdown: QComboBox = self._table.cellWidget(row, 1)
+        dropdown: QComboBox = self._uipacket.table.cellWidget(row, 1)
 
         if not isinstance(dropdown, QComboBox):
             return

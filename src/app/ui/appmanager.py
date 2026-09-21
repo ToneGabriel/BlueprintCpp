@@ -2,15 +2,17 @@ from typing import Any
 
 from app.ui.common import ApplicationState, DisplayItemType
 from app.ui.interfaces import (ILogger, ITree, ITable, IMenu,
-                               ILoggerManager, ITreeManager, ITableManager, IMenuManager)
+                               ILoggerManager, ITreeManager, ITableManager, IMenuManager,
+                               IQuit)
 
 
-class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    # Note: ILoggerManager is last because the rest inherits from it
+class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    # Note: ILoggerManager is the last because the rest inherit from it
     def __init__(self):
         self._logger_reference: ILogger = None
         self._tree_reference: ITree = None
         self._table_reference: ITable = None
         self._menu_reference: IMenu = None
+        self._quit_reference: IQuit = None
     # __init__
 
 
@@ -35,6 +37,11 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     def set_table_reference(self, table: ITable) -> None:
         self._table_reference = table
     # set_table_reference
+
+
+    def set_quit_reference(self, quit: IQuit) -> None:
+        self._quit_reference = quit
+    # set_quit_reference
 
 
     # ===========================================================================
@@ -66,20 +73,19 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
 
     def close_project(self) -> None:
         # TODO: implement
-        pass
+        self._set_application_state(ApplicationState.INIT)
     # close_project
 
 
     def quit_application(self) -> None:
-        # TODO: implement
-        pass
+        self._quit_reference.quit()
     # quit_application
 
 
-    def generate_code(self) -> None:
+    def generate_project_files(self) -> None:
         # TODO: implement
         pass
-    # generate_code
+    # generate_project_files
 
 
     # ===========================================================================

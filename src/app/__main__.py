@@ -116,19 +116,23 @@ def main() -> None:
 
 
 def main_ui() -> None:
-    manager = ui.AppManager()
-
     env = ui.UiEnvironment()
 
-    logger  = ui.LoggerWrapper(env.get_logger_widget())
-    menu    = ui.MenuWrapper(env.get_menubar_widget(), env.get_menubar_action_widgets())
-    tree    = ui.TreeWrapper(env.get_tree_widget())
-    table   = ui.TableWrapper(env.get_table_widget())
+    menu    = ui.MenuWrapper(env.get_menubar_uipacket(),
+                             env.get_new_project_dialog_uipacket(),
+                             env.get_close_project_dialog_uipacket(),
+                             env.get_help_dialog_uipacket())
+    logger  = ui.LoggerWrapper(env.get_logger_uipacket())
+    tree    = ui.TreeWrapper(env.get_tree_uipacket())
+    table   = ui.TableWrapper(env.get_table_uipacket())
+
+    manager = ui.AppManager()
 
     manager.set_logger_reference(logger)
     manager.set_menu_reference(menu)
     manager.set_table_reference(table)
     manager.set_tree_reference(tree)
+    manager.set_quit_reference(env)
 
     logger.set_manager_reference(manager)
     menu.set_manager_reference(manager)

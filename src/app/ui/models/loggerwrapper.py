@@ -2,13 +2,13 @@ from PySide6.QtWidgets import (QTextEdit)
 
 from datetime import datetime
 
-from app.ui.common import ApplicationState
+from app.ui.common import ApplicationState, LoggerUIPacket
 from app.ui.interfaces import ILogger, ILoggerManager
 
 
 class LoggerWrapper(ILogger):
-    def __init__(self, logger: QTextEdit):
-        self._logger = logger
+    def __init__(self, uipacket: LoggerUIPacket):
+        self._uipacket = uipacket
 
         self._manager_reference = None
     # __init__
@@ -36,11 +36,11 @@ class LoggerWrapper(ILogger):
     # ===========================================================================
     def log_message(self, message: str) -> None:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self._logger.append(f"[{timestamp}] - {message}")
+        self._uipacket.logger.append(f"[{timestamp}] - {message}")
     # _log_message
 
 
     def clear_logs(self) -> None:
-        self._logger.clear()
+        self._uipacket.logger.clear()
     # clear_logs
 
