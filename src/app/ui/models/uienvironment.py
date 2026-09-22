@@ -4,7 +4,7 @@ from app.ui.common import (TreeUIPacket, TableUIPacket, LoggerUIPacket, MenubarU
                            HelpDialogUIPacket, NewProjectDialogUIPacket, CloseProjectDialogUIPacket)
 
 from PySide6.QtGui import QFont
-from PySide6.QtWidgets import (QApplication, QMainWindow, QDialog, QStyle)
+from PySide6.QtWidgets import (QApplication, QMainWindow, QDialog, QHeaderView)
 
 
 class UiEnvironment(IQtRoot):
@@ -31,14 +31,17 @@ class UiEnvironment(IQtRoot):
         self._help_dialog_widgets.setupUi(self._help_dialog)
 
         # initialization
-        self._app_font.setPointSize(14)
+        self._app_font.setPointSize(12)
         self._app.setFont(self._app_font)
 
-        self._main_window_widgets.horizontalSplitter.setStretchFactor(0, 1) # tree
-        self._main_window_widgets.horizontalSplitter.setStretchFactor(1, 3) # editor
+        self._main_window_widgets.horizontalSplitter.setStretchFactor(0, 3) # tree
+        self._main_window_widgets.horizontalSplitter.setStretchFactor(1, 1) # tree options
+        self._main_window_widgets.horizontalSplitter.setStretchFactor(2, 6) # editor
 
-        self._main_window_widgets.verticalSplitter.setStretchFactor(0, 3)   # horizontal splitter (tree + editor)
+        self._main_window_widgets.verticalSplitter.setStretchFactor(0, 3)   # horizontal splitter (tree + tree options + editor)
         self._main_window_widgets.verticalSplitter.setStretchFactor(1, 1)   # logger
+
+        self._main_window_widgets.propertiesTable.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
     # __init__
 
 
@@ -46,7 +49,11 @@ class UiEnvironment(IQtRoot):
     # Getters
     # ===========================================================================
     def get_tree_uipacket(self) -> TreeUIPacket:
-        return TreeUIPacket(tree=self._main_window_widgets.projectTree)
+        return TreeUIPacket(tree=self._main_window_widgets.projectTree,
+                            treeOptionsWidget=self._main_window_widgets.treeOptionsWidget,
+                            pushButtonUp=self._main_window_widgets.pushButtonUp,
+                            pushButtonDown=self._main_window_widgets.pushButtonDown
+                            )
     # get_tree_uipacket
 
 

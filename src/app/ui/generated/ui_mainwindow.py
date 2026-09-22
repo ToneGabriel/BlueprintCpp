@@ -17,10 +17,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QHeaderView, QLayout,
-    QMainWindow, QMenu, QMenuBar, QSizePolicy,
-    QSplitter, QStatusBar, QTableWidget, QTableWidgetItem,
-    QTextEdit, QTreeWidget, QTreeWidgetItem, QVBoxLayout,
-    QWidget)
+    QMainWindow, QMenu, QMenuBar, QPushButton,
+    QSizePolicy, QSpacerItem, QSplitter, QStatusBar,
+    QTableWidget, QTableWidgetItem, QTextEdit, QTreeWidget,
+    QTreeWidgetItem, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -68,11 +68,36 @@ class Ui_MainWindow(object):
         self.horizontalSplitter = QSplitter(self.verticalSplitter)
         self.horizontalSplitter.setObjectName(u"horizontalSplitter")
         self.horizontalSplitter.setOrientation(Qt.Orientation.Horizontal)
+        self.horizontalSplitter.setChildrenCollapsible(False)
         self.projectTree = QTreeWidget(self.horizontalSplitter)
         self.projectTree.setObjectName(u"projectTree")
         self.projectTree.setFrameShape(QFrame.Shape.StyledPanel)
         self.projectTree.setFrameShadow(QFrame.Shadow.Sunken)
         self.horizontalSplitter.addWidget(self.projectTree)
+        self.treeOptionsWidget = QWidget(self.horizontalSplitter)
+        self.treeOptionsWidget.setObjectName(u"treeOptionsWidget")
+        self.treeOptionsWidget.setMaximumSize(QSize(45, 16777215))
+        self.verticalLayout = QVBoxLayout(self.treeOptionsWidget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer)
+
+        self.pushButtonUp = QPushButton(self.treeOptionsWidget)
+        self.pushButtonUp.setObjectName(u"pushButtonUp")
+
+        self.verticalLayout.addWidget(self.pushButtonUp)
+
+        self.pushButtonDown = QPushButton(self.treeOptionsWidget)
+        self.pushButtonDown.setObjectName(u"pushButtonDown")
+
+        self.verticalLayout.addWidget(self.pushButtonDown)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_2)
+
+        self.horizontalSplitter.addWidget(self.treeOptionsWidget)
         self.propertiesTable = QTableWidget(self.horizontalSplitter)
         if (self.propertiesTable.columnCount() < 2):
             self.propertiesTable.setColumnCount(2)
@@ -138,6 +163,8 @@ class Ui_MainWindow(object):
         self.actionNew.setText(QCoreApplication.translate("MainWindow", u"New", None))
         ___qtreewidgetitem = self.projectTree.headerItem()
         ___qtreewidgetitem.setText(0, QCoreApplication.translate("MainWindow", u"Project Tree", None))
+        self.pushButtonUp.setText("")
+        self.pushButtonDown.setText("")
         ___qtablewidgetitem = self.propertiesTable.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Properties", None))
         ___qtablewidgetitem1 = self.propertiesTable.horizontalHeaderItem(1)

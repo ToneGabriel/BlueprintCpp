@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QTextEdit, QMenuBar, QTreeWidget, QTableWidget, QDialog, QPushButton, QLineEdit
-from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtWidgets import QTextEdit, QMenuBar, QTreeWidget, QTableWidget, QDialog, QPushButton, QLineEdit, QWidget
+from PySide6.QtGui import QAction
 
 from dataclasses import dataclass
 
@@ -18,6 +18,9 @@ __all__ = [
 @dataclass
 class TreeUIPacket:
     tree: QTreeWidget
+    treeOptionsWidget: QWidget
+    pushButtonUp: QPushButton
+    pushButtonDown: QPushButton
 # TreeUIPacket
 
 

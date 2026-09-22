@@ -15,12 +15,16 @@ class ApplicationState(Enum):
 
 
 class DisplayItemType(Flag):
+    # the order matters in appending tree items
     FOLDER      = auto()
-    CLASS       = auto()
-    INTERFACE   = auto()
+
     ENUM        = auto()
+    INTERFACE   = auto()
+    CLASS       = auto()
+
     INHERITANCE = auto()
     MEMBER      = auto()
     METHOD      = auto()
+
     PARAMETER   = auto()
 # DisplayItemType

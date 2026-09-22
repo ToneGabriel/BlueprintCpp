@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QTableWidget, QTableWidgetItem, QStyle, QTextEdit, QLineEdit, QComboBox, QLabel)
+from PySide6.QtWidgets import (QTableWidget, QTableWidgetItem, QStyle, QTextEdit, QLineEdit, QComboBox, QLabel, QCompleter)
 
 from typing import Any, Type
 
@@ -18,6 +18,8 @@ class TableWrapper(ITable):
         self._visibility_dropdown_items = [(member.value, member) for member in impl.model.Visibility]
         self._indirection_dropdown_items = [(member.value, member) for member in impl.model.Indirection]
         self._boolean_dropdown_items = [("False", False), ("True", True)]
+
+        self._default_type_dropdown_items = ["void", "int", "long", "double", "float"]  # TODO: remove this
     # __init__
 
 
@@ -64,7 +66,7 @@ class TableWrapper(ITable):
             case DisplayItemType.MEMBER:
                 data["description"] = self._get_text_table_row_data(0)
                 data["visibility"]  = self._get_dropdown_table_row_data(1)
-                data["type"]        = self._get_line_table_row_data(2)
+                data["type"]        = self._get_editable_dropdown_table_row_data(2)
                 data["indirection"] = self._get_dropdown_table_row_data(3)
                 data["const"]       = self._get_dropdown_table_row_data(4)
                 data["volatile"]    = self._get_dropdown_table_row_data(5)
@@ -73,7 +75,7 @@ class TableWrapper(ITable):
             case DisplayItemType.METHOD:
                 data["description"] = self._get_text_table_row_data(0)
                 data["visibility"]  = self._get_dropdown_table_row_data(1)
-                data["type"]        = self._get_line_table_row_data(2)
+                data["type"]        = self._get_editable_dropdown_table_row_data(2)
                 data["indirection"] = self._get_dropdown_table_row_data(3)
                 data["const"]       = self._get_dropdown_table_row_data(4)
                 data["volatile"]    = self._get_dropdown_table_row_data(5)
@@ -83,7 +85,7 @@ class TableWrapper(ITable):
 
             case DisplayItemType.PARAMETER:
                 data["description"] = self._get_text_table_row_data(0)
-                data["type"]        = self._get_line_table_row_data(1)
+                data["type"]        = self._get_editable_dropdown_table_row_data(1)
                 data["indirection"] = self._get_dropdown_table_row_data(2)
                 data["const"]       = self._get_dropdown_table_row_data(3)
                 data["volatile"]    = self._get_dropdown_table_row_data(4)
@@ -104,41 +106,41 @@ class TableWrapper(ITable):
             case DisplayItemType.CLASS | DisplayItemType.INTERFACE | DisplayItemType.ENUM:
                 self._initialise_table_row_count(1)
 
-                self._create_text_table_row(0,      "Description",                                  data.get("description", ""))
+                self._create_text_table_row(0,              "Description",                                      data.get("description", ""))
 
             case DisplayItemType.MEMBER:
                 self._initialise_table_row_count(7)
 
-                self._create_text_table_row(0,      "Description",                                   data.get("description", ""))
-                self._create_dropdown_table_row(1,  "Visibility",  self._visibility_dropdown_items,  data.get("visibility", impl.model.Visibility.PRIVATE))
-                self._create_line_table_row(2,      "Type",                                          data.get("type", "void"))
-                self._create_dropdown_table_row(3,  "Indirection", self._indirection_dropdown_items, data.get("indirection", impl.model.Indirection.NONE))
-                self._create_dropdown_table_row(4,  "Is Const",    self._boolean_dropdown_items,     data.get("const", False))
-                self._create_dropdown_table_row(5,  "Is Volatile", self._boolean_dropdown_items,     data.get("volatile", False))
-                self._create_line_table_row(6,      "Default Value",                                 data.get("default", ""))
+                self._create_text_table_row(0,              "Description",                                      data.get("description", ""))
+                self._create_dropdown_table_row(1,          "Visibility",   self._visibility_dropdown_items,    data.get("visibility", impl.model.Visibility.PRIVATE))
+                self._create_editable_dropdown_table_row(2, "Type",         self._default_type_dropdown_items,  data.get("type", "void"))
+                self._create_dropdown_table_row(3,          "Indirection",  self._indirection_dropdown_items,   data.get("indirection", impl.model.Indirection.NONE))
+                self._create_dropdown_table_row(4,          "Is Const",     self._boolean_dropdown_items,       data.get("const", False))
+                self._create_dropdown_table_row(5,          "Is Volatile",  self._boolean_dropdown_items,       data.get("volatile", False))
+                self._create_line_table_row(6,              "Default Value",                                    data.get("default", ""))
 
             case DisplayItemType.METHOD:
                 self._initialise_table_row_count(9)
 
-                self._create_text_table_row(0,      "Description",                                    data.get("description", ""))
-                self._create_dropdown_table_row(1,  "Visibility",   self._visibility_dropdown_items,  data.get("visibility", impl.model.Visibility.PRIVATE))
-                self._create_line_table_row(2,      "Return Type",                                    data.get("type", "void"))
-                self._create_dropdown_table_row(3,  "Indirection",  self._indirection_dropdown_items, data.get("indirection", impl.model.Indirection.NONE))
-                self._create_dropdown_table_row(4,  "Is Const",     self._boolean_dropdown_items,     data.get("const", False))
-                self._create_dropdown_table_row(5,  "Is Volatile",  self._boolean_dropdown_items,     data.get("volatile", False))
-                self._create_dropdown_table_row(6,  "Is Immutable", self._boolean_dropdown_items,     data.get("immutable", False))
-                self._create_dropdown_table_row(7,  "Is Noexcept",  self._boolean_dropdown_items,     data.get("noexcept", False))
-                self._create_dropdown_table_row(8,  "Is Overriden", self._boolean_dropdown_items,     data.get("override", False))
+                self._create_text_table_row(0,              "Description",                                              data.get("description", ""))
+                self._create_dropdown_table_row(1,          "Visibility",           self._visibility_dropdown_items,    data.get("visibility", impl.model.Visibility.PRIVATE))
+                self._create_editable_dropdown_table_row(2, "Return Type",          self._default_type_dropdown_items,  data.get("type", "void"))
+                self._create_dropdown_table_row(3,          "Return Indirection",   self._indirection_dropdown_items,   data.get("indirection", impl.model.Indirection.NONE))
+                self._create_dropdown_table_row(4,          "Return Is Const",      self._boolean_dropdown_items,       data.get("const", False))
+                self._create_dropdown_table_row(5,          "Return Is Volatile",   self._boolean_dropdown_items,       data.get("volatile", False))
+                self._create_dropdown_table_row(6,          "Is Immutable",         self._boolean_dropdown_items,       data.get("immutable", False))
+                self._create_dropdown_table_row(7,          "Is Noexcept",          self._boolean_dropdown_items,       data.get("noexcept", False))
+                self._create_dropdown_table_row(8,          "Is Overriden",         self._boolean_dropdown_items,       data.get("override", False))
 
             case DisplayItemType.PARAMETER:
                 self._initialise_table_row_count(6)
 
-                self._create_text_table_row(0,      "Description",                                   data.get("description", ""))
-                self._create_line_table_row(1,      "Type",                                          data.get("type", "void"))
-                self._create_dropdown_table_row(2,  "Indirection", self._indirection_dropdown_items, data.get("indirection", impl.model.Indirection.NONE))
-                self._create_dropdown_table_row(3,  "Is Const",    self._boolean_dropdown_items,     data.get("const", False))
-                self._create_dropdown_table_row(4,  "Is Volatile", self._boolean_dropdown_items,     data.get("volatile", False))
-                self._create_line_table_row(5,      "Default Value",                                 data.get("default", ""))
+                self._create_text_table_row(0,              "Description",                                      data.get("description", ""))
+                self._create_editable_dropdown_table_row(1, "Type",         self._default_type_dropdown_items,  data.get("type", "void"))
+                self._create_dropdown_table_row(2,          "Indirection",  self._indirection_dropdown_items,   data.get("indirection", impl.model.Indirection.NONE))
+                self._create_dropdown_table_row(3,          "Is Const",     self._boolean_dropdown_items,       data.get("const", False))
+                self._create_dropdown_table_row(4,          "Is Volatile",  self._boolean_dropdown_items,       data.get("volatile", False))
+                self._create_line_table_row(5,              "Default Value",                                    data.get("default", ""))
 
             case _:
                 self._manager_reference.log_message(f"Cannot display data for: {display.name}")
@@ -170,7 +172,7 @@ class TableWrapper(ITable):
 
 
     def _create_text_table_row(self, row: int, title: str, dataToSet: str) -> None:
-        label = QLabel(title)
+        label = QLabel(" " + title + " ")
         textEditor = QTextEdit(dataToSet)
 
         self._uipacket.table.setRowHeight(row, 150)
@@ -190,7 +192,7 @@ class TableWrapper(ITable):
 
 
     def _create_line_table_row(self, row: int, title: str, dataToSet: str) -> None:
-        label = QLabel(title)
+        label = QLabel(" " + title + " ")
         lineEditor = QLineEdit(dataToSet)
 
         self._uipacket.table.setCellWidget(row, 0,label)
@@ -209,7 +211,7 @@ class TableWrapper(ITable):
 
 
     def _create_dropdown_table_row(self, row: int, title: str, items: list[tuple[str, Any]], dataToSet: Any) -> None:
-        label = QLabel(title)
+        label = QLabel(" " + title + " ")
         dropdown = QComboBox()
 
         for text, value in items:
@@ -224,6 +226,31 @@ class TableWrapper(ITable):
     # _create_dropdown_table_row
 
 
+    def _create_editable_dropdown_table_row(self, row, title: str, items: list[str], dataToSet: str):
+        label = QLabel(" " + title + " ")
+        dropdown = QComboBox()
+
+        dropdown.setEditable(True)
+        completer = dropdown.completer()
+        completer.setCompletionMode(QCompleter.PopupCompletion)   # show all matches in a popup list
+        completer.setFilterMode(Qt.MatchContains)                 # match substring anywhere in the text
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+
+        for text in items:
+            dropdown.addItem(text)
+
+        index = dropdown.findData(dataToSet)
+        if index != -1:
+            dropdown.setCurrentIndex(index)
+        else:
+            dropdown.setCurrentIndex(-1)    # no item selected
+            dropdown.setEditText(dataToSet) # show the raw value as typed text
+
+        self._uipacket.table.setCellWidget(row, 0, label)
+        self._uipacket.table.setCellWidget(row, 1, dropdown)
+    # _create_editable_dropdown_table_row
+
+
     def _get_dropdown_table_row_data(self, row: int) -> Any:
         dropdown: QComboBox = self._uipacket.table.cellWidget(row, 1)
 
@@ -232,5 +259,15 @@ class TableWrapper(ITable):
 
         return dropdown.currentData()
     # _get_dropdown_table_row_data
+
+
+    def _get_editable_dropdown_table_row_data(self, row: int) -> Any:
+        dropdown: QComboBox = self._uipacket.table.cellWidget(row, 1)
+
+        if not isinstance(dropdown, QComboBox):
+            return
+
+        return dropdown.currentText()
+    # _get_editable_dropdown_table_row_data
 
 # TableWrapper

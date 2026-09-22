@@ -47,12 +47,15 @@ class TreeWrapper(ITree):
         match newState:
             case ApplicationState.INIT:
                 self._uipacket.tree.setEnabled(False)
+                self._uipacket.treeOptionsWidget.setEnabled(False)
 
             case ApplicationState.OPEN:
                 self._uipacket.tree.setEnabled(True)
+                self._uipacket.treeOptionsWidget.setEnabled(True)
 
             case ApplicationState.BUSY:
-                self._uipacket.tree.setEnabled(True)
+                self._uipacket.tree.setEnabled(False)
+                self._uipacket.treeOptionsWidget.setEnabled(False)
 
             case _:
                 self._manager_reference.log_message(f"Invalid state: {newState.name}")
@@ -79,6 +82,12 @@ class TreeWrapper(ITree):
         self._uipacket.tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self._uipacket.tree.customContextMenuRequested.connect(self._show_tree_context_menu)
         self._uipacket.tree.currentItemChanged.connect(self._on_tree_item_changed)
+
+        self._uipacket.pushButtonUp.clicked.connect(self._move_tree_object_up)
+        self._uipacket.pushButtonUp.setIcon(self._uipacket.tree.style().standardIcon(QStyle.SP_ArrowUp))
+
+        self._uipacket.pushButtonDown.clicked.connect(self._move_tree_object_down)
+        self._uipacket.pushButtonDown.setIcon(self._uipacket.tree.style().standardIcon(QStyle.SP_ArrowDown))
     # _init_tree
 
 
@@ -132,9 +141,19 @@ class TreeWrapper(ITree):
     # _create_parameter_tree_object
 
 
+    def _move_tree_object_up(self) -> None:
+        self._move_tree_object(-1)
+    # _move_tree_object_up
+
+
+    def _move_tree_object_down(self) -> None:
+        self._move_tree_object(1)
+    # _move_tree_object_down
+
+
     def _create_tree_object(self,
                             name: str,
-                            type: DisplayItemType,
+                            itemType: DisplayItemType,
                             parentRequiredType: DisplayItemType,
                             isEditable: bool = True
     ) -> None:
@@ -144,18 +163,25 @@ class TreeWrapper(ITree):
 
         currentItemType = currentItem.data(0, Qt.UserRole)
         if currentItemType is not None and currentItemType not in parentRequiredType:
-            self._manager_reference.log_message(f"Object creation failed: {type.name}")
+            self._manager_reference.log_message(f"Object creation failed: {itemType.name}")
             return
 
         item = QTreeWidgetItem([name])
-        item.setIcon(0, self._uipacket.tree.style().standardIcon(TREE_ITEM_ICON_STYLE_MAP[type]))
-        item.setData(0, Qt.UserRole, type)
+        item.setIcon(0, self._uipacket.tree.style().standardIcon(TREE_ITEM_ICON_STYLE_MAP[itemType]))
+        item.setData(0, Qt.UserRole, itemType)
         item.setData(0, Qt.UserRole + 1, {})
 
         if isEditable:
             item.setFlags(item.flags() | Qt.ItemIsEditable)
 
-        currentItem.addChild(item)
+        # append the item at the end of the same type sublist
+        indexToInsert = currentItem.childCount()
+        for i in range(currentItem.childCount()):
+            if currentItem.child(i).data(0, Qt.UserRole).value > itemType.value:
+                indexToInsert = i
+                break
+
+        currentItem.insertChild(indexToInsert, item)
     # _create_tree_object
 
 
@@ -168,6 +194,38 @@ class TreeWrapper(ITree):
         else:
             self._manager_reference.log_message(f"Cannot delete object: {currentItem.text(0)}")
     # _delete_tree_object
+
+
+    def _move_tree_object(self, offset: int) -> None:
+        item = self._uipacket.tree.currentItem()
+        if item is None:
+            return
+
+        parent = item.parent()
+        if parent is None:
+            return  # top-level item
+
+        index = parent.indexOfChild(item)
+        was_expanded = item.isExpanded()
+        itemType = item.data(0, Qt.UserRole)
+
+        parent.takeChild(index)
+
+        # move within the same type sublist
+        while (offset > 0 and index < parent.childCount()
+            and parent.child(index).data(0, Qt.UserRole).value == itemType.value):
+            index += 1
+            offset -= 1
+
+        while (offset < 0 and index > 0
+            and parent.child(index - 1).data(0, Qt.UserRole).value == itemType.value):
+            index -= 1
+            offset += 1
+
+        parent.insertChild(index, item)
+        item.setExpanded(was_expanded)
+        self._uipacket.tree.setCurrentItem(item)
+    # _move_tree_object
 
 
     def _show_tree_context_menu(self, position) -> None:
