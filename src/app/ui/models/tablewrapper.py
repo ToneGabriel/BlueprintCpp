@@ -4,8 +4,15 @@ from PySide6.QtWidgets import (QTableWidget, QTableWidgetItem, QStyle, QTextEdit
 from typing import Any, Type
 
 import app.impl as impl
-from app.ui.common import DisplayItemType, ApplicationState, TableUIPacket
+from app.ui.common import DisplayItemType, ApplicationState, TableUIPacket, DisplayItemData
 from app.ui.interfaces import ITable, ITableManager
+
+
+PREFIX_MAP = {
+    impl.model.Visibility.PUBLIC: "+",
+    impl.model.Visibility.PROTECTED: "#",
+    impl.model.Visibility.PRIVATE: "\u2212"
+}
 
 
 class TableWrapper(ITable):
@@ -53,99 +60,141 @@ class TableWrapper(ITable):
     # ===========================================================================
     # ITable functionality
     # ===========================================================================
-    def get_contents(self) -> dict[str, Any]:
-        data = {}
+    def get_contents(self) -> DisplayItemData:
+        ret = DisplayItemData(name=None,
+                              prefix=None,
+                              updateTreeDisplay=False,
+                              itemType=self._current_display,
+                              data={}
+                              )
 
         match self._current_display:
             case DisplayItemType.FOLDER:
                 pass
 
             case DisplayItemType.CLASS | DisplayItemType.INTERFACE | DisplayItemType.ENUM:
-                data["description"] = self._get_text_table_row_data(0)
+                ret.name =  self._get_line_table_row_data(0)
+                ret.prefix = ""
+                ret.updateTreeDisplay = True
+
+                ret.data["description"] = self._get_text_table_row_data(1)
+
+            case DisplayItemType.INHERITANCE:
+                ret.name =  self._get_editable_dropdown_table_row_data(0)
+                ret.prefix = ""
+                ret.updateTreeDisplay = True
+
+                ret.data["type"]        = self._get_editable_dropdown_table_row_data(0)                
+                ret.data["visibility"]  = self._get_dropdown_table_row_data(1)
+                ret.data["virtual"]     = self._get_dropdown_table_row_data(2)
 
             case DisplayItemType.MEMBER:
-                data["description"] = self._get_text_table_row_data(0)
-                data["visibility"]  = self._get_dropdown_table_row_data(1)
-                data["type"]        = self._get_editable_dropdown_table_row_data(2)
-                data["indirection"] = self._get_dropdown_table_row_data(3)
-                data["const"]       = self._get_dropdown_table_row_data(4)
-                data["volatile"]    = self._get_dropdown_table_row_data(5)
-                data["default"]     = self._get_line_table_row_data(6)
+                ret.name =  self._get_line_table_row_data(0)
+                ret.prefix = PREFIX_MAP[self._get_dropdown_table_row_data(2)]
+                ret.updateTreeDisplay = True
+
+                ret.data["description"] = self._get_text_table_row_data(1)
+                ret.data["visibility"]  = self._get_dropdown_table_row_data(2)
+                ret.data["type"]        = self._get_editable_dropdown_table_row_data(3)
+                ret.data["indirection"] = self._get_dropdown_table_row_data(4)
+                ret.data["const"]       = self._get_dropdown_table_row_data(5)
+                ret.data["volatile"]    = self._get_dropdown_table_row_data(6)
+                ret.data["default"]     = self._get_line_table_row_data(7)
 
             case DisplayItemType.METHOD:
-                data["description"] = self._get_text_table_row_data(0)
-                data["visibility"]  = self._get_dropdown_table_row_data(1)
-                data["type"]        = self._get_editable_dropdown_table_row_data(2)
-                data["indirection"] = self._get_dropdown_table_row_data(3)
-                data["const"]       = self._get_dropdown_table_row_data(4)
-                data["volatile"]    = self._get_dropdown_table_row_data(5)
-                data["immutable"]   = self._get_dropdown_table_row_data(6)
-                data["noexcept"]    = self._get_dropdown_table_row_data(7)
-                data["override"]    = self._get_dropdown_table_row_data(8)
+                ret.name =  self._get_line_table_row_data(0)
+                ret.prefix = PREFIX_MAP[self._get_dropdown_table_row_data(2)]
+                ret.updateTreeDisplay = True
+
+                ret.data["description"] = self._get_text_table_row_data(1)
+                ret.data["visibility"]  = self._get_dropdown_table_row_data(2)
+                ret.data["type"]        = self._get_editable_dropdown_table_row_data(3)
+                ret.data["indirection"] = self._get_dropdown_table_row_data(4)
+                ret.data["const"]       = self._get_dropdown_table_row_data(5)
+                ret.data["volatile"]    = self._get_dropdown_table_row_data(6)
+                ret.data["immutable"]   = self._get_dropdown_table_row_data(7)
+                ret.data["noexcept"]    = self._get_dropdown_table_row_data(8)
+                ret.data["override"]    = self._get_dropdown_table_row_data(9)
 
             case DisplayItemType.PARAMETER:
-                data["description"] = self._get_text_table_row_data(0)
-                data["type"]        = self._get_editable_dropdown_table_row_data(1)
-                data["indirection"] = self._get_dropdown_table_row_data(2)
-                data["const"]       = self._get_dropdown_table_row_data(3)
-                data["volatile"]    = self._get_dropdown_table_row_data(4)
-                data["default"]     = self._get_line_table_row_data(5)
+                ret.name =  self._get_line_table_row_data(0)
+                ret.prefix = ""
+                ret.updateTreeDisplay = True
+
+                ret.data["description"] = self._get_text_table_row_data(1)
+                ret.data["type"]        = self._get_editable_dropdown_table_row_data(2)
+                ret.data["indirection"] = self._get_dropdown_table_row_data(3)
+                ret.data["const"]       = self._get_dropdown_table_row_data(4)
+                ret.data["volatile"]    = self._get_dropdown_table_row_data(5)
+                ret.data["default"]     = self._get_line_table_row_data(6)
 
             case _:
                 self._manager_reference.log_message(f"Cannot get data for: {self._current_display.name}")
 
-        return data
+        return ret
     # get_contents
 
 
-    def display_contents(self, display: DisplayItemType, data: dict[str, Any]) -> None:
-        match display:
+    def display_contents(self, dataToDisplay:DisplayItemData) -> None:
+        match dataToDisplay.itemType:
             case DisplayItemType.FOLDER:
                 self._initialise_table_row_count(0)
 
             case DisplayItemType.CLASS | DisplayItemType.INTERFACE | DisplayItemType.ENUM:
-                self._initialise_table_row_count(1)
+                self._initialise_table_row_count(2)
 
-                self._create_text_table_row(0,              "Description",                                      data.get("description", ""))
+                self._create_line_table_row(0,              "Name",                                             dataToDisplay.name)
+                self._create_text_table_row(1,              "Description",                                      dataToDisplay.data.get("description", ""))
+
+            case DisplayItemType.INHERITANCE:
+                self._initialise_table_row_count(3)
+
+                self._create_editable_dropdown_table_row(0, "Type",         self._default_type_dropdown_items,  dataToDisplay.data.get("type", "void"))
+                self._create_dropdown_table_row(1,          "Visibility",   self._visibility_dropdown_items,    dataToDisplay.data.get("visibility", impl.model.Visibility.PUBLIC))
+                self._create_dropdown_table_row(2,          "Is Virtual",   self._boolean_dropdown_items,       dataToDisplay.data.get("virtual", False))
 
             case DisplayItemType.MEMBER:
-                self._initialise_table_row_count(7)
+                self._initialise_table_row_count(8)
 
-                self._create_text_table_row(0,              "Description",                                      data.get("description", ""))
-                self._create_dropdown_table_row(1,          "Visibility",   self._visibility_dropdown_items,    data.get("visibility", impl.model.Visibility.PRIVATE))
-                self._create_editable_dropdown_table_row(2, "Type",         self._default_type_dropdown_items,  data.get("type", "void"))
-                self._create_dropdown_table_row(3,          "Indirection",  self._indirection_dropdown_items,   data.get("indirection", impl.model.Indirection.NONE))
-                self._create_dropdown_table_row(4,          "Is Const",     self._boolean_dropdown_items,       data.get("const", False))
-                self._create_dropdown_table_row(5,          "Is Volatile",  self._boolean_dropdown_items,       data.get("volatile", False))
-                self._create_line_table_row(6,              "Default Value",                                    data.get("default", ""))
+                self._create_line_table_row(0,              "Name",                                             dataToDisplay.name)
+                self._create_text_table_row(1,              "Description",                                      dataToDisplay.data.get("description", ""))
+                self._create_dropdown_table_row(2,          "Visibility",   self._visibility_dropdown_items,    dataToDisplay.data.get("visibility", impl.model.Visibility.PRIVATE))
+                self._create_editable_dropdown_table_row(3, "Type",         self._default_type_dropdown_items,  dataToDisplay.data.get("type", "void"))
+                self._create_dropdown_table_row(4,          "Indirection",  self._indirection_dropdown_items,   dataToDisplay.data.get("indirection", impl.model.Indirection.NONE))
+                self._create_dropdown_table_row(5,          "Is Const",     self._boolean_dropdown_items,       dataToDisplay.data.get("const", False))
+                self._create_dropdown_table_row(6,          "Is Volatile",  self._boolean_dropdown_items,       dataToDisplay.data.get("volatile", False))
+                self._create_line_table_row(7,              "Default Value",                                    dataToDisplay.data.get("default", ""))
 
             case DisplayItemType.METHOD:
-                self._initialise_table_row_count(9)
+                self._initialise_table_row_count(10)
 
-                self._create_text_table_row(0,              "Description",                                              data.get("description", ""))
-                self._create_dropdown_table_row(1,          "Visibility",           self._visibility_dropdown_items,    data.get("visibility", impl.model.Visibility.PRIVATE))
-                self._create_editable_dropdown_table_row(2, "Return Type",          self._default_type_dropdown_items,  data.get("type", "void"))
-                self._create_dropdown_table_row(3,          "Return Indirection",   self._indirection_dropdown_items,   data.get("indirection", impl.model.Indirection.NONE))
-                self._create_dropdown_table_row(4,          "Return Is Const",      self._boolean_dropdown_items,       data.get("const", False))
-                self._create_dropdown_table_row(5,          "Return Is Volatile",   self._boolean_dropdown_items,       data.get("volatile", False))
-                self._create_dropdown_table_row(6,          "Is Immutable",         self._boolean_dropdown_items,       data.get("immutable", False))
-                self._create_dropdown_table_row(7,          "Is Noexcept",          self._boolean_dropdown_items,       data.get("noexcept", False))
-                self._create_dropdown_table_row(8,          "Is Overriden",         self._boolean_dropdown_items,       data.get("override", False))
+                self._create_line_table_row(0,              "Name",                                                     dataToDisplay.name)
+                self._create_text_table_row(1,              "Description",                                              dataToDisplay.data.get("description", ""))
+                self._create_dropdown_table_row(2,          "Visibility",           self._visibility_dropdown_items,    dataToDisplay.data.get("visibility", impl.model.Visibility.PRIVATE))
+                self._create_editable_dropdown_table_row(3, "Return Type",          self._default_type_dropdown_items,  dataToDisplay.data.get("type", "void"))
+                self._create_dropdown_table_row(4,          "Return Indirection",   self._indirection_dropdown_items,   dataToDisplay.data.get("indirection", impl.model.Indirection.NONE))
+                self._create_dropdown_table_row(5,          "Return Is Const",      self._boolean_dropdown_items,       dataToDisplay.data.get("const", False))
+                self._create_dropdown_table_row(6,          "Return Is Volatile",   self._boolean_dropdown_items,       dataToDisplay.data.get("volatile", False))
+                self._create_dropdown_table_row(7,          "Is Immutable",         self._boolean_dropdown_items,       dataToDisplay.data.get("immutable", False))
+                self._create_dropdown_table_row(8,          "Is Noexcept",          self._boolean_dropdown_items,       dataToDisplay.data.get("noexcept", False))
+                self._create_dropdown_table_row(9,          "Is Overriden",         self._boolean_dropdown_items,       dataToDisplay.data.get("override", False))
 
             case DisplayItemType.PARAMETER:
-                self._initialise_table_row_count(6)
+                self._initialise_table_row_count(7)
 
-                self._create_text_table_row(0,              "Description",                                      data.get("description", ""))
-                self._create_editable_dropdown_table_row(1, "Type",         self._default_type_dropdown_items,  data.get("type", "void"))
-                self._create_dropdown_table_row(2,          "Indirection",  self._indirection_dropdown_items,   data.get("indirection", impl.model.Indirection.NONE))
-                self._create_dropdown_table_row(3,          "Is Const",     self._boolean_dropdown_items,       data.get("const", False))
-                self._create_dropdown_table_row(4,          "Is Volatile",  self._boolean_dropdown_items,       data.get("volatile", False))
-                self._create_line_table_row(5,              "Default Value",                                    data.get("default", ""))
+                self._create_line_table_row(0,              "Name",                                             dataToDisplay.name)
+                self._create_text_table_row(1,              "Description",                                      dataToDisplay.data.get("description", ""))
+                self._create_editable_dropdown_table_row(2, "Type",         self._default_type_dropdown_items,  dataToDisplay.data.get("type", "void"))
+                self._create_dropdown_table_row(3,          "Indirection",  self._indirection_dropdown_items,   dataToDisplay.data.get("indirection", impl.model.Indirection.NONE))
+                self._create_dropdown_table_row(4,          "Is Const",     self._boolean_dropdown_items,       dataToDisplay.data.get("const", False))
+                self._create_dropdown_table_row(5,          "Is Volatile",  self._boolean_dropdown_items,       dataToDisplay.data.get("volatile", False))
+                self._create_line_table_row(6,              "Default Value",                                    dataToDisplay.data.get("default", ""))
 
             case _:
-                self._manager_reference.log_message(f"Cannot display data for: {display.name}")
+                self._initialise_table_row_count(0)
+                self._manager_reference.log_message(f"Cannot display data for: {dataToDisplay.itemType.name}")
 
-        self._current_display = display
+        self._current_display = dataToDisplay.itemType
     # display_contents
 
 
@@ -261,7 +310,7 @@ class TableWrapper(ITable):
     # _get_dropdown_table_row_data
 
 
-    def _get_editable_dropdown_table_row_data(self, row: int) -> Any:
+    def _get_editable_dropdown_table_row_data(self, row: int) -> str:
         dropdown: QComboBox = self._uipacket.table.cellWidget(row, 1)
 
         if not isinstance(dropdown, QComboBox):

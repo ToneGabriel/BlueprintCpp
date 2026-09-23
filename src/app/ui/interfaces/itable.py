@@ -1,17 +1,16 @@
 from abc import abstractmethod
-from typing import Any
 
 from .istate import IState
-from app.ui.common import DisplayItemType
+from app.ui.common import DisplayItemData
 
 
 class ITable(IState):
 
     @abstractmethod
-    def get_contents(self) -> dict[str, Any]:...
+    def get_contents(self) -> DisplayItemData:...
 
     @abstractmethod
-    def display_contents(self, display: DisplayItemType, data: dict[str, Any]) -> None:...
+    def display_contents(self, dataToDisplay: DisplayItemData) -> None:...
 
     @abstractmethod
     def clear(self) -> None:...

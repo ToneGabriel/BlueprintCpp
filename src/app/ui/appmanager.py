@@ -1,7 +1,7 @@
 from typing import Any
 from pathlib import Path
 
-from app.ui.common import ApplicationState, DisplayItemType
+from app.ui.common import ApplicationState, DisplayItemType, DisplayItemData
 from app.ui.interfaces import (ILogger, ITree, ITable, IMenu,
                                ILoggerManager, ITreeManager, ITableManager, IMenuManager,
                                IQtRoot)
@@ -110,12 +110,12 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # ===========================================================================
     # ITreeManager functionality
     # ===========================================================================
-    def display_table_contents(self, display: DisplayItemType, data: dict[str, Any]) -> None:
-        self._table_reference.display_contents(display, data)
+    def display_table_contents(self, dataToDisplay: DisplayItemData) -> None:
+        self._table_reference.display_contents(dataToDisplay)
     # display_table_contents
 
 
-    def get_table_contents(self) -> dict[str, Any]:
+    def get_table_contents(self) -> DisplayItemData:
         return self._table_reference.get_contents()
     # get_table_contents
 

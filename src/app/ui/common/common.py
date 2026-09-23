@@ -1,9 +1,12 @@
 from enum import Enum, Flag, auto
+from dataclasses import dataclass
+from typing import Any
 
 
 __all__ = [
     "ApplicationState",
-    "DisplayItemType"
+    "DisplayItemType",
+    "DisplayItemData"
 ]
 
 
@@ -28,3 +31,13 @@ class DisplayItemType(Flag):
 
     PARAMETER   = auto()
 # DisplayItemType
+
+
+@dataclass
+class DisplayItemData:
+    name: str
+    prefix: str
+    updateTreeDisplay: bool
+    itemType: DisplayItemType
+    data: dict[str, Any]
+# DisplayItemData
