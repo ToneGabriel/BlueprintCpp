@@ -5,6 +5,7 @@ from .iloggermanager import ILoggerManager
 
 
 class ITableManager(ILoggerManager):
-    pass
+    @abstractmethod
+    def get_namespaces(self) -> list[str]:...
 
 # ITableManager

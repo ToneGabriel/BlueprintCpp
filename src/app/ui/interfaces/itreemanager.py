@@ -12,4 +12,10 @@ class ITreeManager(ILoggerManager):
     @abstractmethod
     def get_table_contents(self) -> DisplayItemData:...
 
+    @abstractmethod
+    def store_namespace(self, namespace: str) -> None:...
+
+    @abstractmethod
+    def remove_namespace(self, namespace: str) -> None:...
+
 # ITreeManager

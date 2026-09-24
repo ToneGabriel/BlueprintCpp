@@ -25,8 +25,6 @@ class TableWrapper(ITable):
         self._visibility_dropdown_items = [(member.value, member) for member in impl.model.Visibility]
         self._indirection_dropdown_items = [(member.value, member) for member in impl.model.Indirection]
         self._boolean_dropdown_items = [("False", False), ("True", True)]
-
-        self._default_type_dropdown_items = ["void", "int", "long", "double", "float"]  # TODO: remove this
     # __init__
 
 
@@ -136,6 +134,8 @@ class TableWrapper(ITable):
 
 
     def display_contents(self, dataToDisplay:DisplayItemData) -> None:
+        namespaces = self._manager_reference.get_namespaces()
+
         match dataToDisplay.itemType:
             case DisplayItemType.FOLDER:
                 self._initialise_table_row_count(0)
@@ -149,7 +149,7 @@ class TableWrapper(ITable):
             case DisplayItemType.INHERITANCE:
                 self._initialise_table_row_count(3)
 
-                self._create_editable_dropdown_table_row(0, "Type",         self._default_type_dropdown_items,  dataToDisplay.data.get("type", "void"))
+                self._create_editable_dropdown_table_row(0, "Type",         namespaces,                         dataToDisplay.data.get("type", "void"))
                 self._create_dropdown_table_row(1,          "Visibility",   self._visibility_dropdown_items,    dataToDisplay.data.get("visibility", impl.model.Visibility.PUBLIC))
                 self._create_dropdown_table_row(2,          "Is Virtual",   self._boolean_dropdown_items,       dataToDisplay.data.get("virtual", False))
 
@@ -159,7 +159,7 @@ class TableWrapper(ITable):
                 self._create_line_table_row(0,              "Name",                                             dataToDisplay.name)
                 self._create_text_table_row(1,              "Description",                                      dataToDisplay.data.get("description", ""))
                 self._create_dropdown_table_row(2,          "Visibility",   self._visibility_dropdown_items,    dataToDisplay.data.get("visibility", impl.model.Visibility.PRIVATE))
-                self._create_editable_dropdown_table_row(3, "Type",         self._default_type_dropdown_items,  dataToDisplay.data.get("type", "void"))
+                self._create_editable_dropdown_table_row(3, "Type",         namespaces,                         dataToDisplay.data.get("type", "void"))
                 self._create_dropdown_table_row(4,          "Indirection",  self._indirection_dropdown_items,   dataToDisplay.data.get("indirection", impl.model.Indirection.NONE))
                 self._create_dropdown_table_row(5,          "Is Const",     self._boolean_dropdown_items,       dataToDisplay.data.get("const", False))
                 self._create_dropdown_table_row(6,          "Is Volatile",  self._boolean_dropdown_items,       dataToDisplay.data.get("volatile", False))
@@ -171,7 +171,7 @@ class TableWrapper(ITable):
                 self._create_line_table_row(0,              "Name",                                                     dataToDisplay.name)
                 self._create_text_table_row(1,              "Description",                                              dataToDisplay.data.get("description", ""))
                 self._create_dropdown_table_row(2,          "Visibility",           self._visibility_dropdown_items,    dataToDisplay.data.get("visibility", impl.model.Visibility.PRIVATE))
-                self._create_editable_dropdown_table_row(3, "Return Type",          self._default_type_dropdown_items,  dataToDisplay.data.get("type", "void"))
+                self._create_editable_dropdown_table_row(3, "Return Type",          namespaces,                         dataToDisplay.data.get("type", "void"))
                 self._create_dropdown_table_row(4,          "Return Indirection",   self._indirection_dropdown_items,   dataToDisplay.data.get("indirection", impl.model.Indirection.NONE))
                 self._create_dropdown_table_row(5,          "Return Is Const",      self._boolean_dropdown_items,       dataToDisplay.data.get("const", False))
                 self._create_dropdown_table_row(6,          "Return Is Volatile",   self._boolean_dropdown_items,       dataToDisplay.data.get("volatile", False))
@@ -184,7 +184,7 @@ class TableWrapper(ITable):
 
                 self._create_line_table_row(0,              "Name",                                             dataToDisplay.name)
                 self._create_text_table_row(1,              "Description",                                      dataToDisplay.data.get("description", ""))
-                self._create_editable_dropdown_table_row(2, "Type",         self._default_type_dropdown_items,  dataToDisplay.data.get("type", "void"))
+                self._create_editable_dropdown_table_row(2, "Type",         namespaces,                         dataToDisplay.data.get("type", "void"))
                 self._create_dropdown_table_row(3,          "Indirection",  self._indirection_dropdown_items,   dataToDisplay.data.get("indirection", impl.model.Indirection.NONE))
                 self._create_dropdown_table_row(4,          "Is Const",     self._boolean_dropdown_items,       dataToDisplay.data.get("const", False))
                 self._create_dropdown_table_row(5,          "Is Volatile",  self._boolean_dropdown_items,       dataToDisplay.data.get("volatile", False))

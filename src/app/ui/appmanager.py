@@ -12,6 +12,7 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
         # internal data
         self._project_name = ""
         self._project_path = ""
+        self._namespaces = set()
 
         # references
         self._logger_reference: ILogger = None
@@ -120,10 +121,22 @@ class AppManager(ITreeManager, ITableManager, IMenuManager, ILoggerManager):    
     # get_table_contents
 
 
+    def store_namespace(self, namespace: str) -> None:
+        self._namespaces.add(namespace)
+    # store_namespace
+
+
+    def remove_namespace(self, namespace: str) -> None:
+        self._namespaces.remove(namespace)
+    # remove_namespace
+
+
     # ===========================================================================
     # ITableManager functionality
     # ===========================================================================
-    # None so far
+    def get_namespaces(self) -> list[str]:
+        return list(self._namespaces)
+    # get_namespaces
 
 
     # ===========================================================================

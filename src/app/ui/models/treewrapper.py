@@ -20,10 +20,11 @@ TREE_ITEM_ICON_STYLE_MAP = {
 }
 
 
-_ITEM_NAME_ID = 0
-_ITEM_PREF_ID = 1
-_ITEM_TYPE_ID = 2
-_ITEM_DATA_ID = 3
+_ITEM_NAME_ID       = 0
+_ITEM_PREFIX_ID     = 1
+_ITEM_TYPE_ID       = 2
+_ITEM_DATA_ID       = 3
+_ITEM_NAMESPACE_ID  = 4
 
 
 class TreeWrapper(ITree):
@@ -92,7 +93,7 @@ class TreeWrapper(ITree):
     # ITree functionality
     # ===========================================================================
     def create_root(self, name: str) -> None:
-        self._create_tree_object(name, DisplayItemType.FOLDER, None, False)
+        self._create_tree_object(name, DisplayItemType.FOLDER, None)
     # create_root
 
 
@@ -110,37 +111,37 @@ class TreeWrapper(ITree):
 
 
     def _create_class_tree_object(self) -> None:
-        self._create_tree_object("NewClass", DisplayItemType.CLASS, DisplayItemType.FOLDER, False)
+        self._create_tree_object("NewClass", DisplayItemType.CLASS, DisplayItemType.FOLDER, True)
     # _create_class_tree_object
 
 
     def _create_interface_tree_object(self) -> None:
-        self._create_tree_object("NewInterface", DisplayItemType.INTERFACE, DisplayItemType.FOLDER, False)
+        self._create_tree_object("NewInterface", DisplayItemType.INTERFACE, DisplayItemType.FOLDER, True)
     # _create_interface_tree_object
 
 
     def _create_enum_tree_object(self) -> None:
-        self._create_tree_object("NewEnum", DisplayItemType.ENUM, DisplayItemType.FOLDER, False)
+        self._create_tree_object("NewEnum", DisplayItemType.ENUM, DisplayItemType.FOLDER, True)
     # _create_enum_tree_object
 
 
     def _create_inheritance_tree_object(self) -> None:
-        self._create_tree_object("NewInheritance", DisplayItemType.INHERITANCE, DisplayItemType.CLASS | DisplayItemType.INTERFACE, False)
+        self._create_tree_object("NewInheritance", DisplayItemType.INHERITANCE, DisplayItemType.CLASS | DisplayItemType.INTERFACE)
     # _create_inheritance_tree_object
 
 
     def _create_member_tree_object(self) -> None:
-        self._create_tree_object("NewMember", DisplayItemType.MEMBER, DisplayItemType.CLASS, False)
+        self._create_tree_object("NewMember", DisplayItemType.MEMBER, DisplayItemType.CLASS)
     # _create_member_tree_object
 
 
     def _create_method_tree_object(self) -> None:
-        self._create_tree_object("NewMethod", DisplayItemType.METHOD, DisplayItemType.CLASS | DisplayItemType.INTERFACE, False)
+        self._create_tree_object("NewMethod", DisplayItemType.METHOD, DisplayItemType.CLASS | DisplayItemType.INTERFACE)
     # _create_method_tree_object
 
 
     def _create_parameter_tree_object(self) -> None:
-        self._create_tree_object("NewParameter", DisplayItemType.PARAMETER, DisplayItemType.METHOD, False)
+        self._create_tree_object("NewParameter", DisplayItemType.PARAMETER, DisplayItemType.METHOD)
     # _create_parameter_tree_object
 
 
@@ -158,7 +159,7 @@ class TreeWrapper(ITree):
                             name: str,
                             itemType: DisplayItemType,
                             parentRequiredType: DisplayItemType,
-                            isEditable: bool = True
+                            storeNamespace: bool = False
     ) -> None:
         currentItem = self._uipacket.tree.currentItem()
         if currentItem is None:
@@ -169,15 +170,23 @@ class TreeWrapper(ITree):
             self._manager_reference.log_message(f"Object creation failed: {itemType.name}")
             return
 
+        currentItemNamespace = currentItem.data(0, Qt.UserRole + _ITEM_NAMESPACE_ID)
+        if currentItemNamespace is None:
+            currentItemNamespace = ""
+
         item = QTreeWidgetItem([name])
+        itemNamespace = currentItemNamespace + "::" + name
+
+        item.setFlags(item.flags() | Qt.ItemIsEditable)
         item.setIcon(0, self._uipacket.tree.style().standardIcon(TREE_ITEM_ICON_STYLE_MAP[itemType]))
         item.setData(0, Qt.UserRole + _ITEM_NAME_ID, name)
-        item.setData(0, Qt.UserRole + _ITEM_PREF_ID, "")
+        item.setData(0, Qt.UserRole + _ITEM_PREFIX_ID, "")
         item.setData(0, Qt.UserRole + _ITEM_TYPE_ID, itemType)
         item.setData(0, Qt.UserRole + _ITEM_DATA_ID, {})
+        item.setData(0, Qt.UserRole + _ITEM_NAMESPACE_ID, itemNamespace)
 
-        if isEditable:
-            item.setFlags(item.flags() | Qt.ItemIsEditable)
+        if storeNamespace:
+            self._manager_reference.store_namespace(itemNamespace)
 
         # append the item at the end of the same type sublist
         indexToInsert = currentItem.childCount()
@@ -197,6 +206,7 @@ class TreeWrapper(ITree):
         parent = currentItem.parent()
 
         if parent is not None:
+            self._manager_reference.remove_namespace(currentItem.data(0, Qt.UserRole + _ITEM_NAMESPACE_ID))
             parent.removeChild(currentItem)
         else:
             self._manager_reference.log_message(f"Cannot delete object: {currentItem.text(0)}")
@@ -248,7 +258,7 @@ class TreeWrapper(ITree):
             if previousItemData.updateTreeDisplay:
                 previousItem.setText(0, previousItemData.prefix + previousItemData.name)
                 previousItem.setData(0, Qt.UserRole + _ITEM_NAME_ID, previousItemData.name)
-                previousItem.setData(0, Qt.UserRole + _ITEM_PREF_ID, previousItemData.prefix)
+                previousItem.setData(0, Qt.UserRole + _ITEM_PREFIX_ID, previousItemData.prefix)
 
             previousItem.setData(0, Qt.UserRole + _ITEM_DATA_ID, previousItemData.data)
 
@@ -257,7 +267,7 @@ class TreeWrapper(ITree):
             currentItemData: DisplayItemData = DisplayItemData(name=currentItem.data(0, Qt.UserRole + _ITEM_NAME_ID),
                                                                prefix=None,                 # placeholder
                                                                updateTreeDisplay=False,     # placeholder
-                                                               itemType=currentItem.data(0, Qt.UserRole+ _ITEM_TYPE_ID),
+                                                               itemType=currentItem.data(0, Qt.UserRole + _ITEM_TYPE_ID),
                                                                data=currentItem.data(0, Qt.UserRole + _ITEM_DATA_ID))
             self._manager_reference.display_table_contents(currentItemData)
     # _on_tree_item_changed
